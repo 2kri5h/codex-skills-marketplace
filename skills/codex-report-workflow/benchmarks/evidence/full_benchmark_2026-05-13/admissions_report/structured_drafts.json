@@ -1,0 +1,269 @@
+{
+  "generated_by": "scripts.run_report_benchmarks",
+  "benchmark_fixture": "benchmarks\\fixtures\\controlled_source.md",
+  "sections": {
+    "abstract": {
+      "title": "Abstract",
+      "sentences": [
+        {
+          "text": "This report presents a structured workflow project as evidence of graduate-study readiness, technical judgment, and reflective quality assurance practice. The project converted ambiguous intake notes into auditable artifacts, processed the same notes through baseline and structured conditions, and compared processing, repair, and reviewer response signals without treating the pilot as broadly generalizable. The strongest admissions-facing contribution is not a claim of universal performance; it is the demonstrated habit of drawing boundaries around evidence, selecting claims that can be supported, and naming limits before interpretation. The project also shows practical implementation awareness because proposal inputs identify effort, setup cost, reviewer training risk, and onboarding mitigation. For programs in human-centered computing, technical communication, or applied information systems, the work illustrates how reliability, source discipline, and communication design can be joined in a small but auditable project. It also shows the applicant can separate supportive satisfaction evidence from primary measured evidence.",
+          "claim_ids": [
+            "c_context",
+            "c_method",
+            "c_limit",
+            "c_proposal"
+          ],
+          "evidence_ids": [
+            "E_00f5d0b5_ac7dd5ae30",
+            "E_00f5d0b5_30e66c74da",
+            "E_00f5d0b5_3daff80c86",
+            "E_00f5d0b5_f2a7b118c6"
+          ],
+          "citation_ids": [
+            "E_00f5d0b5_ac7dd5ae30",
+            "E_00f5d0b5_30e66c74da",
+            "E_00f5d0b5_3daff80c86",
+            "E_00f5d0b5_f2a7b118c6"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "introduction": {
+      "title": "Introduction",
+      "sentences": [
+        {
+          "text": "The structured workflow pilot is best read as a bounded evidence-handling and QA thinking project: it converted intake notes into auditable report artifacts, compared a controlled procedure, recorded measurement signals, bounded its claims, treated satisfaction as supportive evidence, and named adoption assumptions.",
+          "claim_ids": [
+            "c_context",
+            "c_method",
+            "c_measurement",
+            "c_limit",
+            "c_satisfaction",
+            "c_proposal"
+          ],
+          "evidence_ids": [
+            "E_00f5d0b5_ac7dd5ae30",
+            "E_00f5d0b5_30e66c74da",
+            "E_00f5d0b5_4bc8203773",
+            "E_00f5d0b5_3daff80c86",
+            "E_00f5d0b5_58124ba649",
+            "E_00f5d0b5_f2a7b118c6"
+          ],
+          "citation_ids": [
+            "E_00f5d0b5_ac7dd5ae30",
+            "E_00f5d0b5_30e66c74da",
+            "E_00f5d0b5_4bc8203773",
+            "E_00f5d0b5_3daff80c86",
+            "E_00f5d0b5_58124ba649",
+            "E_00f5d0b5_f2a7b118c6"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "research_scope": {
+      "title": "Research Scope and Design Framing",
+      "sentences": [
+        {
+          "text": "The controlled scope keeps the project tied to the tested intake workflow, the same participant-note procedure, and explicit limits on generalization.",
+          "claim_ids": [
+            "c_method",
+            "c_limit"
+          ],
+          "evidence_ids": [
+            "E_00f5d0b5_30e66c74da",
+            "E_00f5d0b5_3daff80c86"
+          ],
+          "citation_ids": [
+            "E_00f5d0b5_30e66c74da",
+            "E_00f5d0b5_3daff80c86"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "methods": {
+      "title": "Methods",
+      "sentences": [
+        {
+          "text": "The methods used the controlled source dataset as the sample basis, processed the same 42 participant notes once with the baseline manual procedure and once with the structured workflow, compared the conditions on median processing time per note, detected error rate, and reviewer satisfaction, and used no exclusions beyond the documented pilot scope; deterministic chart transforms were kept in figure metadata rather than recomputed in prose.",
+          "claim_ids": [
+            "c_method",
+            "c_measurement",
+            "c_limit"
+          ],
+          "evidence_ids": [
+            "E_00f5d0b5_30e66c74da",
+            "E_00f5d0b5_4bc8203773",
+            "E_00f5d0b5_3daff80c86"
+          ],
+          "citation_ids": [
+            "E_00f5d0b5_30e66c74da",
+            "E_00f5d0b5_4bc8203773",
+            "E_00f5d0b5_3daff80c86"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "results": {
+      "title": "Results",
+      "sentences": [
+        {
+          "text": "Across the same 42 notes, median processing time fell from 28 minutes per note under the manual baseline to 20 minutes under the structured workflow, the share of notes needing reviewer repair fell from 7.5% to 4.1%, and reviewer satisfaction rose from 71% to 84%.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_00f5d0b5_4bc8203773"
+          ],
+          "citation_ids": [
+            "E_00f5d0b5_4bc8203773"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 1 compares the two conditions directly: the structured workflow brings median processing time down from 28 to 20 minutes per note. [FIGURE:1]\n\nFigure 1: Median processing time per note, manual baseline versus structured workflow (minutes).",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_00f5d0b5_4bc8203773"
+          ],
+          "citation_ids": [
+            "E_00f5d0b5_4bc8203773"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 2 traces the month-by-month trend across the pilot period, with median processing time falling as the structured workflow settled in. [FIGURE:2]\n\nFigure 2: Median processing time per note by month over the pilot period (minutes).",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_00f5d0b5_4bc8203773"
+          ],
+          "citation_ids": [
+            "E_00f5d0b5_4bc8203773"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 3 sets intake complexity against review effort, showing that more complex notes demanded proportionally more reviewer attention. [FIGURE:3]\n\nFigure 3: Review effort score versus intake complexity score for the sampled notes.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_00f5d0b5_4bc8203773"
+          ],
+          "citation_ids": [
+            "E_00f5d0b5_4bc8203773"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 4 shows the spread of per-note processing times within each condition, not just the medians. [FIGURE:4]\n\nFigure 4: Distribution of per-note processing minutes under each condition.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_00f5d0b5_4bc8203773"
+          ],
+          "citation_ids": [
+            "E_00f5d0b5_4bc8203773"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 5 lists the adoption parameters behind the proposal: two onboarding sessions, a one-week shadow period, and USD 4,800 in setup cost. [FIGURE:5]\n\nFigure 5: Adoption planning parameters from the proposal inputs.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_00f5d0b5_4bc8203773"
+          ],
+          "citation_ids": [
+            "E_00f5d0b5_4bc8203773"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "discussion": {
+      "title": "Discussion",
+      "sentences": [
+        {
+          "text": "The pattern \u2014 faster processing, fewer repairs, and higher reviewer satisfaction \u2014 is useful for decision-making because it combines practical review signals with a clear warning that the pilot should not be generalized beyond the tested workflow.",
+          "claim_ids": [
+            "c_measurement",
+            "c_limit"
+          ],
+          "evidence_ids": [
+            "E_00f5d0b5_4bc8203773",
+            "E_00f5d0b5_3daff80c86"
+          ],
+          "citation_ids": [
+            "E_00f5d0b5_4bc8203773",
+            "E_00f5d0b5_3daff80c86"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "limitations": {
+      "title": "Limitations",
+      "sentences": [
+        {
+          "text": "The study remains a pilot, and reviewer satisfaction should be interpreted as supportive evidence rather than the primary basis for adoption.",
+          "claim_ids": [
+            "c_limit",
+            "c_satisfaction"
+          ],
+          "evidence_ids": [
+            "E_00f5d0b5_3daff80c86",
+            "E_00f5d0b5_58124ba649"
+          ],
+          "citation_ids": [
+            "E_00f5d0b5_3daff80c86",
+            "E_00f5d0b5_58124ba649"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "conclusion": {
+      "title": "Conclusion",
+      "sentences": [
+        {
+          "text": "The project demonstrates evidence handling, workflow design, QA thinking, and the discipline to keep learning claims within the tested source boundaries.",
+          "claim_ids": [
+            "c_context",
+            "c_limit",
+            "c_satisfaction"
+          ],
+          "evidence_ids": [
+            "E_00f5d0b5_ac7dd5ae30",
+            "E_00f5d0b5_3daff80c86",
+            "E_00f5d0b5_58124ba649"
+          ],
+          "citation_ids": [
+            "E_00f5d0b5_ac7dd5ae30",
+            "E_00f5d0b5_3daff80c86",
+            "E_00f5d0b5_58124ba649"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "references": {
+      "title": "References",
+      "sentences": []
+    }
+  },
+  "_contract": {
+    "job_id": "run_9fb2cf1e",
+    "evidence_ledger_hash": "cbabb570bf12815f",
+    "source_registry_hash": "c0ca199ba9fc54b3"
+  }
+}

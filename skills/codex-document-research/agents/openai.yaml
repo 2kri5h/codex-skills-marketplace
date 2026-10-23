@@ -1,0 +1,4 @@
+interface:
+  display_name: "Document Research"
+  short_description: "Deep scholarly research with traceable evidence"
+  default_prompt: "Use $document-research to investigate my topic and produce a rigorous, source-verified academic report."

@@ -1,0 +1,266 @@
+{
+  "generated_by": "scripts.run_report_benchmarks",
+  "benchmark_fixture": "benchmarks\\fixtures\\controlled_source.md",
+  "sections": {
+    "abstract": {
+      "title": "Abstract",
+      "sentences": [
+        {
+          "text": "## Background\nDocument intake work often loses traceability when source notes, claims, and final prose are reviewed as separate products. The controlled pilot examined a small academic-lab intake workflow where notes were normalized into evidence-bounded report artifacts.\n## Objective\nThe objective was to assess whether a structured workflow could preserve auditability while improving practical review signals for processing, errors, reviewer confidence, and future adoption planning.\n## Methods\nThe same 42 participant notes were processed once with the baseline manual method and once with the structured workflow, then compared on median processing time per note, the share of notes needing reviewer repair, and reviewer satisfaction. The procedure also recorded constraints that limit generalization.\n## Principal Findings\nThe structured workflow reduced median processing time from 28 to 20 minutes per note and the error rate from 7.5% to 4.1%, while reviewer satisfaction rose from 71% to 84%. Satisfaction remains supportive rather than primary evidence, and the proposal inputs frame adoption through six weeks of effort, USD 4,800 in setup cost, training risk, and onboarding mitigation.\n## Significance\nThe benchmark supports using evidence boundaries, explicit methods, adoption assumptions, and limitation statements as quality controls for report generation research. Its value is methodological: it creates a controlled profile comparison without converting one sample report into a universal template.",
+          "claim_ids": [
+            "c_context",
+            "c_method",
+            "c_measurement",
+            "c_limit",
+            "c_satisfaction",
+            "c_proposal"
+          ],
+          "evidence_ids": [
+            "E_99b682df_79b15e34f7",
+            "E_99b682df_77ac292413",
+            "E_99b682df_222b5a1fe5",
+            "E_99b682df_b21f472ecb",
+            "E_99b682df_ef5e3bdcd1",
+            "E_99b682df_9f9a42e98f"
+          ],
+          "citation_ids": [
+            "E_99b682df_79b15e34f7",
+            "E_99b682df_77ac292413",
+            "E_99b682df_222b5a1fe5",
+            "E_99b682df_b21f472ecb",
+            "E_99b682df_ef5e3bdcd1",
+            "E_99b682df_9f9a42e98f"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "introduction": {
+      "title": "Introduction",
+      "sentences": [
+        {
+          "text": "The gap addressed by this benchmark is the limited visibility between source intake notes, claim selection, and final report prose in small evidence-handling workflows. The objective is to evaluate a controlled structured workflow pilot using the same source data, procedure, quality criteria, and report-profile comparison across every run. The contribution is a reproducible source-to-report case that demonstrates how evidence boundaries, deterministic chart guidance, and QA artifacts can be assessed without treating one reference report as a universal template.",
+          "claim_ids": [
+            "c_context",
+            "c_method",
+            "c_measurement",
+            "c_limit"
+          ],
+          "evidence_ids": [
+            "E_99b682df_79b15e34f7",
+            "E_99b682df_77ac292413",
+            "E_99b682df_222b5a1fe5",
+            "E_99b682df_b21f472ecb"
+          ],
+          "citation_ids": [
+            "E_99b682df_79b15e34f7",
+            "E_99b682df_77ac292413",
+            "E_99b682df_222b5a1fe5",
+            "E_99b682df_b21f472ecb"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "research_scope": {
+      "title": "Research Scope and Design Framing",
+      "sentences": [
+        {
+          "text": "The controlled scope keeps the project tied to the tested intake workflow, the same participant-note procedure, and explicit limits on generalization.",
+          "claim_ids": [
+            "c_method",
+            "c_limit"
+          ],
+          "evidence_ids": [
+            "E_99b682df_77ac292413",
+            "E_99b682df_b21f472ecb"
+          ],
+          "citation_ids": [
+            "E_99b682df_77ac292413",
+            "E_99b682df_b21f472ecb"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "methods": {
+      "title": "Methods",
+      "sentences": [
+        {
+          "text": "The methods used the controlled source dataset as the sample basis, processed the same 42 participant notes once with the baseline manual procedure and once with the structured workflow, compared the conditions on median processing time per note, detected error rate, and reviewer satisfaction, and used no exclusions beyond the documented pilot scope; deterministic chart transforms were kept in figure metadata rather than recomputed in prose.",
+          "claim_ids": [
+            "c_method",
+            "c_measurement",
+            "c_limit"
+          ],
+          "evidence_ids": [
+            "E_99b682df_77ac292413",
+            "E_99b682df_222b5a1fe5",
+            "E_99b682df_b21f472ecb"
+          ],
+          "citation_ids": [
+            "E_99b682df_77ac292413",
+            "E_99b682df_222b5a1fe5",
+            "E_99b682df_b21f472ecb"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "results": {
+      "title": "Results",
+      "sentences": [
+        {
+          "text": "Across the same 42 notes, median processing time fell from 28 minutes per note under the manual baseline to 20 minutes under the structured workflow, the share of notes needing reviewer repair fell from 7.5% to 4.1%, and reviewer satisfaction rose from 71% to 84%.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_99b682df_222b5a1fe5"
+          ],
+          "citation_ids": [
+            "E_99b682df_222b5a1fe5"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 1 compares the two conditions directly: the structured workflow brings median processing time down from 28 to 20 minutes per note. [FIGURE:1]\n\nFigure 1: Median processing time per note, manual baseline versus structured workflow (minutes).",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_99b682df_222b5a1fe5"
+          ],
+          "citation_ids": [
+            "E_99b682df_222b5a1fe5"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 2 traces the month-by-month trend across the pilot period, with median processing time falling as the structured workflow settled in. [FIGURE:2]\n\nFigure 2: Median processing time per note by month over the pilot period (minutes).",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_99b682df_222b5a1fe5"
+          ],
+          "citation_ids": [
+            "E_99b682df_222b5a1fe5"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 3 sets intake complexity against review effort, showing that more complex notes demanded proportionally more reviewer attention. [FIGURE:3]\n\nFigure 3: Review effort score versus intake complexity score for the sampled notes.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_99b682df_222b5a1fe5"
+          ],
+          "citation_ids": [
+            "E_99b682df_222b5a1fe5"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 4 shows the spread of per-note processing times within each condition, not just the medians. [FIGURE:4]\n\nFigure 4: Distribution of per-note processing minutes under each condition.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_99b682df_222b5a1fe5"
+          ],
+          "citation_ids": [
+            "E_99b682df_222b5a1fe5"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 5 lists the adoption parameters behind the proposal: two onboarding sessions, a one-week shadow period, and USD 4,800 in setup cost. [FIGURE:5]\n\nFigure 5: Adoption planning parameters from the proposal inputs.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_99b682df_222b5a1fe5"
+          ],
+          "citation_ids": [
+            "E_99b682df_222b5a1fe5"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "discussion": {
+      "title": "Discussion",
+      "sentences": [
+        {
+          "text": "The pattern \u2014 faster processing, fewer repairs, and higher reviewer satisfaction \u2014 is useful for decision-making because it combines practical review signals with a clear warning that the pilot should not be generalized beyond the tested workflow.",
+          "claim_ids": [
+            "c_measurement",
+            "c_limit"
+          ],
+          "evidence_ids": [
+            "E_99b682df_222b5a1fe5",
+            "E_99b682df_b21f472ecb"
+          ],
+          "citation_ids": [
+            "E_99b682df_222b5a1fe5",
+            "E_99b682df_b21f472ecb"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "limitations": {
+      "title": "Limitations",
+      "sentences": [
+        {
+          "text": "The study remains a pilot, and reviewer satisfaction should be interpreted as supportive evidence rather than the primary basis for adoption.",
+          "claim_ids": [
+            "c_limit",
+            "c_satisfaction"
+          ],
+          "evidence_ids": [
+            "E_99b682df_b21f472ecb",
+            "E_99b682df_ef5e3bdcd1"
+          ],
+          "citation_ids": [
+            "E_99b682df_b21f472ecb",
+            "E_99b682df_ef5e3bdcd1"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "conclusion": {
+      "title": "Conclusion",
+      "sentences": [
+        {
+          "text": "Overall, the pilot supports cautious workflow adoption and further study because its favorable review signals remain bounded by a small synthetic source fixture.",
+          "claim_ids": [
+            "c_measurement",
+            "c_limit"
+          ],
+          "evidence_ids": [
+            "E_99b682df_222b5a1fe5",
+            "E_99b682df_b21f472ecb"
+          ],
+          "citation_ids": [
+            "E_99b682df_222b5a1fe5",
+            "E_99b682df_b21f472ecb"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "references": {
+      "title": "References",
+      "sentences": []
+    }
+  },
+  "_contract": {
+    "job_id": "run_11e7ba0f",
+    "evidence_ledger_hash": "a7e1a6184180d823",
+    "source_registry_hash": "46a2c9d966da9e18"
+  }
+}

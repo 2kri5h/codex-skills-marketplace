@@ -1,0 +1,49 @@
+{
+  "job_id": "run_11e7ba0f",
+  "status": "passed",
+  "generated_count": 5,
+  "issue_count": 0,
+  "issues": [],
+  "figures": [
+    {
+      "figure_id": "1",
+      "figure_type": "bar",
+      "path": "D:\\report_workflow\\output\\benchmark_runs\\Structured Workflow Pilot for Evidence-Bounded Report Generation--run_11e7ba0f\\figures\\1.png",
+      "status": "passed",
+      "issue_count": 0,
+      "issues": []
+    },
+    {
+      "figure_id": "2",
+      "figure_type": "line",
+      "path": "D:\\report_workflow\\output\\benchmark_runs\\Structured Workflow Pilot for Evidence-Bounded Report Generation--run_11e7ba0f\\figures\\2.png",
+      "status": "passed",
+      "issue_count": 0,
+      "issues": []
+    },
+    {
+      "figure_id": "3",
+      "figure_type": "scatter",
+      "path": "D:\\report_workflow\\output\\benchmark_runs\\Structured Workflow Pilot for Evidence-Bounded Report Generation--run_11e7ba0f\\figures\\3.png",
+      "status": "passed",
+      "issue_count": 0,
+      "issues": []
+    },
+    {
+      "figure_id": "4",
+      "figure_type": "boxplot",
+      "path": "D:\\report_workflow\\output\\benchmark_runs\\Structured Workflow Pilot for Evidence-Bounded Report Generation--run_11e7ba0f\\figures\\4.png",
+      "status": "passed",
+      "issue_count": 0,
+      "issues": []
+    },
+    {
+      "figure_id": "5",
+      "figure_type": "table",
+      "path": "D:\\report_workflow\\output\\benchmark_runs\\Structured Workflow Pilot for Evidence-Bounded Report Generation--run_11e7ba0f\\figures\\5.png",
+      "status": "passed",
+      "issue_count": 0,
+      "issues": []
+    }
+  ]
+}

@@ -1,0 +1,228 @@
+{
+  "generated_by": "scripts.run_report_benchmarks",
+  "benchmark_fixture": "benchmarks\\fixtures\\controlled_source.md",
+  "sections": {
+    "abstract": {
+      "title": "Abstract",
+      "sentences": [
+        {
+          "text": "The controlled source describes a synthetic pilot for converting intake notes into auditable report artifacts. It records the workflow context, the comparison procedure, the measured results for both conditions, the proposal inputs, and project-learning constraints. The report uses these source elements to describe what changed, what can be recommended, and what should remain bounded as pilot evidence.",
+          "claim_ids": [
+            "c_context",
+            "c_method",
+            "c_measurement",
+            "c_limit"
+          ],
+          "evidence_ids": [
+            "E_7c5a8cc4_bc16ee21ed",
+            "E_7c5a8cc4_582c9799e4",
+            "E_7c5a8cc4_4b23f20279",
+            "E_7c5a8cc4_2b458588c3"
+          ],
+          "citation_ids": [
+            "E_7c5a8cc4_bc16ee21ed",
+            "E_7c5a8cc4_582c9799e4",
+            "E_7c5a8cc4_4b23f20279",
+            "E_7c5a8cc4_2b458588c3"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "introduction": {
+      "title": "Introduction",
+      "sentences": [
+        {
+          "text": "The structured workflow pilot is best read as a bounded evidence-handling and QA thinking project: it converted intake notes into auditable report artifacts, compared a controlled procedure, recorded measurement signals, bounded its claims, treated satisfaction as supportive evidence, and named adoption assumptions.",
+          "claim_ids": [
+            "c_context",
+            "c_method",
+            "c_measurement",
+            "c_limit",
+            "c_satisfaction",
+            "c_proposal"
+          ],
+          "evidence_ids": [
+            "E_7c5a8cc4_bc16ee21ed",
+            "E_7c5a8cc4_582c9799e4",
+            "E_7c5a8cc4_4b23f20279",
+            "E_7c5a8cc4_2b458588c3",
+            "E_7c5a8cc4_b3fdcf524c",
+            "E_7c5a8cc4_74e395fdf4"
+          ],
+          "citation_ids": [
+            "E_7c5a8cc4_bc16ee21ed",
+            "E_7c5a8cc4_582c9799e4",
+            "E_7c5a8cc4_4b23f20279",
+            "E_7c5a8cc4_2b458588c3",
+            "E_7c5a8cc4_b3fdcf524c",
+            "E_7c5a8cc4_74e395fdf4"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "methods": {
+      "title": "Methods",
+      "sentences": [
+        {
+          "text": "The methods used the controlled source dataset as the sample basis, processed the same 42 participant notes once with the baseline manual procedure and once with the structured workflow, compared the conditions on median processing time per note, detected error rate, and reviewer satisfaction, and used no exclusions beyond the documented pilot scope; deterministic chart transforms were kept in figure metadata rather than recomputed in prose.",
+          "claim_ids": [
+            "c_method",
+            "c_measurement",
+            "c_limit"
+          ],
+          "evidence_ids": [
+            "E_7c5a8cc4_582c9799e4",
+            "E_7c5a8cc4_4b23f20279",
+            "E_7c5a8cc4_2b458588c3"
+          ],
+          "citation_ids": [
+            "E_7c5a8cc4_582c9799e4",
+            "E_7c5a8cc4_4b23f20279",
+            "E_7c5a8cc4_2b458588c3"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "results": {
+      "title": "Results",
+      "sentences": [
+        {
+          "text": "Across the same 42 notes, median processing time fell from 28 minutes per note under the manual baseline to 20 minutes under the structured workflow, the share of notes needing reviewer repair fell from 7.5% to 4.1%, and reviewer satisfaction rose from 71% to 84%.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_7c5a8cc4_4b23f20279"
+          ],
+          "citation_ids": [
+            "E_7c5a8cc4_4b23f20279"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 1 compares the two conditions directly: the structured workflow brings median processing time down from 28 to 20 minutes per note. [FIGURE:1]\n\nFigure 1: Median processing time per note, manual baseline versus structured workflow (minutes).",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_7c5a8cc4_4b23f20279"
+          ],
+          "citation_ids": [
+            "E_7c5a8cc4_4b23f20279"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 2 traces the month-by-month trend across the pilot period, with median processing time falling as the structured workflow settled in. [FIGURE:2]\n\nFigure 2: Median processing time per note by month over the pilot period (minutes).",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_7c5a8cc4_4b23f20279"
+          ],
+          "citation_ids": [
+            "E_7c5a8cc4_4b23f20279"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 3 sets intake complexity against review effort, showing that more complex notes demanded proportionally more reviewer attention. [FIGURE:3]\n\nFigure 3: Review effort score versus intake complexity score for the sampled notes.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_7c5a8cc4_4b23f20279"
+          ],
+          "citation_ids": [
+            "E_7c5a8cc4_4b23f20279"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 4 shows the spread of per-note processing times within each condition, not just the medians. [FIGURE:4]\n\nFigure 4: Distribution of per-note processing minutes under each condition.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_7c5a8cc4_4b23f20279"
+          ],
+          "citation_ids": [
+            "E_7c5a8cc4_4b23f20279"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 5 lists the adoption parameters behind the proposal: two onboarding sessions, a one-week shadow period, and USD 4,800 in setup cost. [FIGURE:5]\n\nFigure 5: Adoption planning parameters from the proposal inputs.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_7c5a8cc4_4b23f20279"
+          ],
+          "citation_ids": [
+            "E_7c5a8cc4_4b23f20279"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "discussion": {
+      "title": "Discussion",
+      "sentences": [
+        {
+          "text": "The pattern \u2014 faster processing, fewer repairs, and higher reviewer satisfaction \u2014 is useful for decision-making because it combines practical review signals with a clear warning that the pilot should not be generalized beyond the tested workflow.",
+          "claim_ids": [
+            "c_measurement",
+            "c_limit"
+          ],
+          "evidence_ids": [
+            "E_7c5a8cc4_4b23f20279",
+            "E_7c5a8cc4_2b458588c3"
+          ],
+          "citation_ids": [
+            "E_7c5a8cc4_4b23f20279",
+            "E_7c5a8cc4_2b458588c3"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "recommendations": {
+      "title": "Recommendations",
+      "sentences": [
+        {
+          "text": "A cautious next step is to evaluate adoption with reviewer training, onboarding sessions, and the same evidence-boundary discipline used in the pilot.",
+          "claim_ids": [
+            "c_proposal",
+            "c_satisfaction"
+          ],
+          "evidence_ids": [
+            "E_7c5a8cc4_74e395fdf4",
+            "E_7c5a8cc4_b3fdcf524c"
+          ],
+          "citation_ids": [
+            "E_7c5a8cc4_74e395fdf4",
+            "E_7c5a8cc4_b3fdcf524c"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "references": {
+      "title": "References",
+      "sentences": []
+    },
+    "appendix": {
+      "title": "Appendix",
+      "sentences": []
+    }
+  },
+  "_contract": {
+    "job_id": "run_2111cb15",
+    "evidence_ledger_hash": "5abfc03b95ea5660",
+    "source_registry_hash": "57f2a21ffa403a91"
+  }
+}

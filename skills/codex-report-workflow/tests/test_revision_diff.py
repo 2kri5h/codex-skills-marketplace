@@ -1,0 +1,796 @@
+"""Tests for base_document_diff and revision_apply enhancements."""
+import json
+import tempfile
+import unittest
+from pathlib import Path
+
+from report_workflow.nodes.base_document_diff import (
+    compute_revision_diff,
+    detect_overlapping_changes,
+    compute_section_diff_summary,
+    write_diff_report,
+)
+from report_workflow.agent_wrapper import (
+    submit_revision_plan,
+    preview_revision_diff,
+)
+from report_workflow.state import register_job_run
+
+
+class RemapEvidenceReportingTests(unittest.TestCase):
+    """A repair tool must report the files it rewrote, readably.
+
+    Stamping the fresh _contract onto claim_matrix.json, outline.json, and
+    sentence_map.jsonl is a write, but touched_files was only appended by the
+    id-rewriting branches — which do nothing when the ids map one-to-one, the
+    ordinary case since source ids became content-derived. So the usual run
+    rewrote three of the author's artifacts and reported touching none, and
+    escaped their Chinese while it was there.
+    """
+
+    def test_contract_stamping_is_reported_and_stays_readable(self):
+        import uuid
+        from report_workflow.artifact_contract import remap_evidence_ids
+        from report_workflow.state import ReportState, run_dir_for
+
+        def build(prompt: str) -> tuple[str, str]:
+            tmpdir = Path(tempfile.mkdtemp())
+            state = ReportState.new(prompt, [], str(tmpdir / "out"))
+            state.job_id = f"test_remap_{uuid.uuid4().hex}"
+            state.checkpoint("TEST")
+            run_dir = run_dir_for(state.job_id, workspace_root=state.output["workspace_root"])
+            (run_dir / "evidence_ledger.jsonl").write_text(
+                json.dumps({"evidence_id": "E_a_1", "content": "不良率 4.2%"},
+                           ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+            (run_dir / "claim_matrix.json").write_text(
+                json.dumps({"claims": [{"claim_id": "c1",
+                                        "claim_text": "不良率為 4.2%。",
+                                        "evidence_ids": ["E_a_1"]}]},
+                           ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            return state.job_id, state.output["workspace_root"]
+
+        old_job, old_root = build("舊案")
+        new_job, new_root = build("新案")
+
+        result = remap_evidence_ids(
+            new_job, old_job, write=True,
+            workspace_root=new_root, previous_workspace_root=old_root,
+        )
+        claim_path = run_dir_for(new_job, workspace_root=new_root) / "claim_matrix.json"
+        self.assertIn(str(claim_path), result["files_touched"])
+        self.assertIn("不良率為 4.2%。", claim_path.read_text(encoding="utf-8"))
+
+
+class InvalidateCacheTests(unittest.TestCase):
+    """The command must say what happened and not garble the checkpoint.
+
+    Passing --sources printed "Use --sources or --drafts", telling the author
+    to do the thing they had just done; and the rewrite dropped
+    ensure_ascii=False, so every Chinese value in the checkpoint came back as
+    \\uXXXX even though state.py had written it readable.
+    """
+
+    def _run(self, *, sources: bool, drafts: bool):
+        import contextlib
+        import io
+        import uuid
+        from report_workflow.cli import _run_invalidate_cache
+        from report_workflow.state import ReportState, run_dir_for
+
+        tmpdir = Path(tempfile.mkdtemp())
+        state = ReportState.new("月報分析", [], str(tmpdir / "out"))
+        state.job_id = f"test_invalidate_{uuid.uuid4().hex}"
+        state.drafts["merged_draft_md"] = "月報草稿.md"
+        state.checkpoint("TEST")
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            _run_invalidate_cache(
+                state.job_id, sources, drafts,
+                workspace_root=state.output["workspace_root"],
+            )
+        latest = run_dir_for(
+            state.job_id, workspace_root=state.output["workspace_root"]
+        ) / "checkpoint_latest.json"
+        return buffer.getvalue(), latest.read_text(encoding="utf-8")
+
+    def test_a_flag_that_matched_nothing_does_not_ask_for_that_flag(self):
+        output, _raw = self._run(sources=True, drafts=False)
+        self.assertIn("--sources matched no cached entries", output)
+
+    def test_no_flag_still_asks_for_one(self):
+        output, _raw = self._run(sources=False, drafts=False)
+        self.assertIn("Nothing selected", output)
+
+    def test_the_rewritten_checkpoint_stays_readable(self):
+        output, raw = self._run(sources=False, drafts=True)
+        self.assertIn("Cleared drafts.merged_draft_md", output)
+        self.assertIn("月報分析", raw)
+        self.assertNotIn("\\u6708", raw)
+
+
+class DiffCheckpointReferenceTests(unittest.TestCase):
+    """`diff --against` accepts what its help says it accepts.
+
+    Every reference went straight to run_dir_for as a job id, so a checkpoint
+    path, a checkpoint name, and a checkpoint filename all ended in "No local
+    workflow run found for job <what you typed>" — leaving the one comparison
+    the command is named for, two checkpoints of one run, unreachable.
+    """
+
+    def _job(self):
+        import uuid
+        from report_workflow.state import ReportState, run_dir_for
+
+        tmpdir = Path(tempfile.mkdtemp())
+        state = ReportState.new("報告", [], str(tmpdir / "out"))
+        state.job_id = f"test_diff_{uuid.uuid4().hex}"
+        state.checkpoint("EARLY")
+        state.spec["report_profile"] = "engineering_lab_report"
+        state.checkpoint("LATE")
+        return state, run_dir_for(state.job_id, workspace_root=state.output["workspace_root"])
+
+    def _diff(self, state, against: str) -> tuple[int, str]:
+        import contextlib
+        import io
+        from report_workflow.cli import _run_diff
+
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = _run_diff(
+                state.job_id, against, workspace_root=state.output["workspace_root"]
+            )
+        return code, out.getvalue() + err.getvalue()
+
+    def test_a_checkpoint_name_resolves_within_the_run(self):
+        state, _run_dir = self._job()
+        code, text = self._diff(state, "EARLY")
+        self.assertEqual(code, 0)
+        self.assertIn("report_profile", text)
+
+    def test_a_checkpoint_path_resolves(self):
+        state, run_dir = self._job()
+        code, text = self._diff(state, str(run_dir / "checkpoint_EARLY.json"))
+        self.assertEqual(code, 0)
+        self.assertIn("report_profile", text)
+
+    def test_an_unresolvable_reference_is_reported_not_raised(self):
+        state, _run_dir = self._job()
+        code, text = self._diff(state, "no_such_thing")
+        self.assertEqual(code, 1)
+        self.assertIn("Could not resolve --against", text)
+
+
+class DiagnoseRevisionStatusTests(unittest.TestCase):
+    """`diagnose` must not report work it has no evidence of.
+
+    "OK: all changes applied successfully" was printed whenever the unapplied
+    list was absent — which is also what a brand-new draft with no revision
+    plan looks like, and what a revision that never reached REVISION_APPLY
+    looks like. A diagnostic is read exactly when someone is trying to find
+    out what went wrong.
+    """
+
+    def _diagnose(self, **state_setup) -> str:
+        import contextlib
+        import io
+        from report_workflow.cli import _run_diagnose
+        from report_workflow.state import ReportState
+
+        tmpdir = tempfile.mkdtemp()
+        state = ReportState.new("報告", [], str(Path(tmpdir) / "out"))
+        for key, value in state_setup.get("spec", {}).items():
+            state.spec[key] = value
+        for key, value in state_setup.get("runtime", {}).items():
+            state.runtime[key] = value
+        state.checkpoint("TEST")
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            _run_diagnose(state.job_id, verbose=False,
+                          workspace_root=state.output["workspace_root"])
+        return buffer.getvalue()
+
+    def test_a_new_draft_is_not_reported_as_a_successful_revision(self):
+        output = self._diagnose()
+        self.assertNotIn("all changes applied successfully", output)
+        self.assertIn("not a revision run", output)
+
+    def test_a_revision_before_apply_is_not_reported_as_applied(self):
+        output = self._diagnose(spec={"task_intent": "revise_existing"})
+        self.assertNotIn("all changes applied successfully", output)
+        self.assertIn("has not reached REVISION_APPLY", output)
+
+    def test_an_applied_revision_still_reports_success(self):
+        output = self._diagnose(
+            spec={"task_intent": "revise_existing"},
+            runtime={"revision_diff_report_path": "revision_diff_report.json"},
+        )
+        self.assertIn("all changes applied successfully", output)
+
+    def test_unapplied_changes_reach_the_summary(self):
+        output = self._diagnose(
+            spec={"task_intent": "revise_existing"},
+            runtime={
+                "revision_diff_report_path": "revision_diff_report.json",
+                "revision_unapplied": ["[replace] '圖 1' not found in section 'results'"],
+            },
+        )
+        self.assertIn("could not be applied", output)
+        self.assertNotIn("OK: no issues found", output)
+
+
+class BaseDocumentImageCarryTests(unittest.TestCase):
+    """A figure is content the author put there, so a revision must keep it.
+
+    Reading only `w:t` text nodes dropped every embedded image: changing one
+    word in a report deleted its chart and left the caption standing over
+    nothing — the same shape as a References heading with no entries.
+    """
+
+    def _fixture(self, tmpdir):
+        from docx import Document
+        from docx.shared import Inches
+
+        import base64
+
+        png = Path(tmpdir) / "chart.png"
+        # Smallest valid PNG: 1x1, transparent.
+        png.write_bytes(base64.b64decode(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk"
+            "YPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+        ))
+        doc = Document()
+        doc.add_heading("1. 結果", level=1)
+        doc.add_paragraph("量測結果如下。")
+        doc.add_picture(str(png), width=Inches(2))
+        doc.add_paragraph("圖 1. 效能對流量。")
+        path = str(Path(tmpdir) / "base.docx")
+        doc.save(path)
+        return path
+
+    def test_image_is_extracted_and_linked_in_place(self):
+        from report_workflow.nodes.base_document_parse import _parse_docx_section
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            media_dir = Path(tmpdir) / "base_media"
+            sections, _titles = _parse_docx_section(
+                self._fixture(tmpdir), media_dir=media_dir
+            )
+            carrying = [sid for sid, text in sections.items() if "![](" in text]
+            self.assertEqual(len(carrying), 1, f"expected one section with an image: {sections}")
+            body = sections[carrying[0]]
+            self.assertLess(body.index("![]("), body.index("圖 1."),
+                            "image must stay above its caption")
+            self.assertTrue(list(media_dir.iterdir()), "no media was extracted")
+
+    def test_without_media_dir_nothing_is_extracted(self):
+        """The default stays text-only, so callers that never render images
+        (and the .md/.txt paths) are unaffected."""
+        from report_workflow.nodes.base_document_parse import _parse_docx_section
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sections, _titles = _parse_docx_section(self._fixture(tmpdir))
+            self.assertFalse([t for t in sections.values() if "![](" in t])
+
+
+class SectionIdSurvivesRenumberingTests(unittest.TestCase):
+    """A heading's number is a line number wearing a different hat.
+
+    Section ids were the heading slug, so inserting a missing methods
+    section renumbered every heading below it: "2. 結果" became "3. 結果"
+    and a revision plan written against the first no longer resolved — same
+    section, same words, different identity. Revise mode is the one mode
+    where the base document is expected to be edited between runs.
+    """
+
+    def _ids(self, headings):
+        from docx import Document
+
+        from report_workflow.nodes.base_document_parse import _parse_docx_section
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = str(Path(tmpdir) / "report.docx")
+            document = Document()
+            document.add_heading("板式熱交換器效能報告", level=1)
+            for title in headings:
+                document.add_heading(title, level=2)
+                document.add_paragraph(f"{title} 的內容。")
+            document.save(path)
+            return _parse_docx_section(path)
+
+    def test_renumbering_does_not_change_a_section_id(self):
+        before, _ = self._ids(["1. 實驗目的", "2. 結果", "3. 討論"])
+        after, _ = self._ids(["1. 實驗目的", "2. 實驗方法", "3. 結果", "4. 討論"])
+        self.assertTrue(set(before) <= set(after), sorted(set(before) - set(after)))
+
+    def test_the_heading_a_reader_sees_keeps_its_number(self):
+        _sections, titles = self._ids(["1. 實驗目的", "2. 結果"])
+        self.assertEqual(titles["結果"], "2. 結果")
+
+    def test_two_sections_reading_the_same_stay_distinct(self):
+        sections, _ = self._ids(["1. 結果", "2. 結果"])
+        self.assertEqual(len([s for s in sections if s.startswith("結果")]), 2)
+
+    def test_an_unnumbered_heading_is_unchanged(self):
+        sections, _ = self._ids(["Results", "Discussion"])
+        self.assertIn("results", sections)
+        self.assertIn("discussion", sections)
+
+
+class BaseDocumentTableCarryTests(unittest.TestCase):
+    """Revising your own report used to destroy the tables in it.
+
+    The parser walked every w:p in the document, and the paragraphs inside a
+    table cell are w:p too, so a six-row measurement table left as twenty-one
+    loose lines: "72.4" sat on a line of its own with nothing saying it was
+    the effectiveness measured at 2.0 L/min. The revised document rendered a
+    column of stray numbers where the table had been, and no claim could be
+    checked against the column a figure came from.
+    """
+
+    GRID = [("Flow Rate (L/min)", "Measured Effectiveness (%)"),
+            ("2.0", "72.4"), ("3.0", "76.1"), ("4.0", "79.3")]
+
+    def _sections(self, grid):
+        from docx import Document
+        from report_workflow.nodes.base_document_parse import _parse_docx_section
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = str(Path(tmpdir) / "report.docx")
+            document = Document()
+            document.add_heading("Results", level=1)
+            document.add_paragraph("Measurements taken with calibrated meters.")
+            table = document.add_table(rows=len(grid), cols=len(grid[0]))
+            for row_index, row in enumerate(grid):
+                for col_index, cell in enumerate(row):
+                    table.cell(row_index, col_index).text = cell
+            document.add_paragraph("Effectiveness rises with flow rate.")
+            document.save(path)
+            sections, _titles = _parse_docx_section(path)
+        return sections
+
+    def _results_body(self, grid=None):
+        sections = self._sections(grid or self.GRID)
+        return next(body for sid, body in sections.items() if "results" in sid)
+
+    def test_a_table_survives_as_a_table(self):
+        body = self._results_body()
+        self.assertIn("| Flow Rate (L/min) | Measured Effectiveness (%) |", body)
+        self.assertIn("| --- | --- |", body)
+
+    def test_a_number_keeps_the_row_it_came_from(self):
+        body = self._results_body()
+        self.assertIn("| 2.0 | 72.4 |", body)
+        # The old failure: each cell on its own line.
+        self.assertNotIn("\n72.4\n", body)
+
+    def test_prose_around_the_table_is_kept_in_order(self):
+        body = self._results_body()
+        before = body.index("calibrated meters")
+        table = body.index("| Flow Rate")
+        after = body.index("rises with flow rate")
+        self.assertLess(before, table)
+        self.assertLess(table, after)
+
+    def test_a_one_row_table_does_not_become_a_headerless_table(self):
+        body = self._results_body([("Total", "83.1")])
+        self.assertNotIn("---", body)
+        self.assertIn("Total 83.1", body)
+
+
+class BaseDocumentEncodingTests(unittest.TestCase):
+    """The base document has its own readers, and they were missed.
+
+    dcf42f5 routed the four readers in `parsers/` through a shared decoder, but
+    `base_document_parse` reads markdown and text itself. Revising a Big5
+    document still failed at BASE_DOCUMENT_PARSE with the same codec error —
+    the fifth time in this repo that fixing one site left its neighbour.
+    """
+
+    BASE = "# 報告\n\n## 1. 實驗目的\n\n量測不同流量下的有效度。\n\n## 2. 結論\n\n尚待確認成因。\n"
+
+    def test_a_big5_markdown_base_document_parses(self):
+        from report_workflow.nodes.base_document_parse import _parse_markdown_sections
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "base.md"
+            path.write_bytes(self.BASE.encode("big5"))
+            # Section bodies; the heading text lives in the keys and titles.
+            joined = " ".join(_parse_markdown_sections(str(path)).values())
+            self.assertIn("量測不同流量下的有效度", joined)
+            self.assertIn("尚待確認成因", joined)
+
+    def test_big5_section_titles_keep_their_numbering(self):
+        from report_workflow.nodes.base_document_parse import _extract_markdown_section_titles
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "base.md"
+            path.write_bytes(self.BASE.encode("big5"))
+            titles = _extract_markdown_section_titles(str(path))
+            self.assertTrue(any("1. 實驗目的" == t for t in titles.values()), titles)
+
+    def test_utf8_base_documents_are_unchanged(self):
+        from report_workflow.nodes.base_document_parse import _parse_markdown_sections
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "base.md"
+            path.write_text(self.BASE, encoding="utf-8")
+            joined = " ".join(_parse_markdown_sections(str(path)).values())
+            self.assertIn("量測不同流量下的有效度", joined)
+
+
+class GeneratedTocIngestTests(unittest.TestCase):
+    """Reading back our own output must not re-ingest our own scaffolding.
+
+    A rendered report's front matter is title page, then the generated table of
+    contents. Revising it captured both into the preamble while the next render
+    added a fresh TOC, so the scaffolding accumulated one copy per revision.
+    """
+
+    def _drop(self, text):
+        from report_workflow.nodes.base_document_parse import _drop_generated_toc
+
+        return _drop_generated_toc(text)
+
+    def test_generated_toc_is_removed_and_title_page_kept(self):
+        from report_workflow.nodes.docx_render import _TOC_PLACEHOLDERS, _TOC_TITLES
+
+        preamble = "\n".join([
+            "熱傳學實驗", "國立成功大學機械工程學系", "蔡知均", "2026 年 7 月",
+            _TOC_TITLES["zh"], _TOC_PLACEHOLDERS["zh"],
+        ])
+        cleaned = self._drop(preamble)
+        self.assertEqual(cleaned.split("\n"),
+                         ["熱傳學實驗", "國立成功大學機械工程學系", "蔡知均", "2026 年 7 月"])
+
+    def test_english_scaffolding_is_removed_too(self):
+        from report_workflow.nodes.docx_render import _TOC_PLACEHOLDERS, _TOC_TITLES
+
+        cleaned = self._drop(
+            f"Heat Transfer Lab\nJ. Tsai\n{_TOC_TITLES['en']}\n{_TOC_PLACEHOLDERS['en']}"
+        )
+        self.assertEqual(cleaned.split("\n"), ["Heat Transfer Lab", "J. Tsai"])
+
+    def test_a_real_heading_named_like_the_toc_is_kept(self):
+        """"目錄" is an ordinary word. Without the placeholder under it, an
+        author's own line by that name is theirs, not ours."""
+        cleaned = self._drop("報告封面\n目錄\n本章說明目錄的編排方式。")
+        self.assertIn("目錄", cleaned.split("\n"))
+
+    def test_repeated_revision_does_not_accumulate(self):
+        from report_workflow.nodes.docx_render import _TOC_PLACEHOLDERS, _TOC_TITLES
+
+        once = self._drop(f"封面\n{_TOC_TITLES['zh']}\n{_TOC_PLACEHOLDERS['zh']}")
+        twice = self._drop(f"{once}\n{_TOC_TITLES['zh']}\n{_TOC_PLACEHOLDERS['zh']}")
+        self.assertEqual(once, twice)
+
+
+class BaseDocumentHeadingRoundTripTests(unittest.TestCase):
+    """Revising a document must not rewrite its headings.
+
+    Section ids are slugs of the heading text, and the titles map was built as
+    an identity over those slugs, so every numbered heading came back out with
+    an underscore in it: "1. 實驗目的" rendered as "1._實驗目的". Ten headings in
+    a real lab report, in the DOCX the author would hand in.
+    """
+
+    HEADINGS = ["摘要", "1. 實驗目的", "2. 需求與規格矩陣", "10. 附錄"]
+
+    def _parse(self, tmpdir):
+        from docx import Document
+
+        from report_workflow.nodes.base_document_parse import _parse_docx_section
+
+        doc = Document()
+        for heading in self.HEADINGS:
+            doc.add_heading(heading, level=1)
+            doc.add_paragraph(f"{heading} 的內文。")
+        path = str(Path(tmpdir) / "base.docx")
+        doc.save(path)
+        return _parse_docx_section(path)
+
+    def test_titles_keep_the_heading_text_verbatim(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            _sections, titles = self._parse(tmpdir)
+            self.assertEqual(sorted(titles.values()), sorted(self.HEADINGS))
+
+    def test_no_title_carries_a_slug_underscore(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            _sections, titles = self._parse(tmpdir)
+            self.assertFalse(
+                [title for title in titles.values() if "_" in title],
+                f"slug leaked into a display title: {titles}",
+            )
+
+    def test_every_addressable_section_has_a_title(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sections, titles = self._parse(tmpdir)
+            addressable = [sid for sid in sections if sid != "preamble"]
+            self.assertTrue(addressable)
+            for section_id in addressable:
+                self.assertIn(section_id, titles)
+
+
+class ComputeRevisionDiffTests(unittest.TestCase):
+    """Test compute_revision_diff function."""
+
+    def setUp(self):
+        self.base = {
+            "introduction": "The system uses AST parsing to build intermediate representations.",
+            "results": "We analyzed 388 files with 5,171 nodes and 9,764 edges.",
+            "discussion": "The hub structure suggests a modular design pattern.",
+        }
+
+    def test_all_valid_changes(self):
+        plan = {"changes": [
+            {
+                "section_id": "results",
+                "change_type": "replace",
+                "original_text": "388 files",
+                "new_text": "400 files",
+            },
+            {
+                "section_id": "discussion",
+                "change_type": "replace",
+                "original_text": "modular design",
+                "new_text": "highly modular design",
+            },
+        ]}
+        result = compute_revision_diff(self.base, plan)
+        self.assertEqual(result["total_changes"], 2)
+        self.assertEqual(result["valid_changes"], 2)
+        self.assertEqual(len(result["unresolvable"]), 0)
+        self.assertEqual(len(result["conflicts"]), 0)
+
+    def test_unresolvable_original_text(self):
+        plan = {"changes": [
+            {
+                "section_id": "results",
+                "change_type": "replace",
+                "original_text": "THIS TEXT DOES NOT EXIST",
+                "new_text": "replacement",
+            },
+        ]}
+        result = compute_revision_diff(self.base, plan)
+        self.assertEqual(result["valid_changes"], 0)
+        self.assertEqual(len(result["unresolvable"]), 1)
+        self.assertIn("not found", result["unresolvable"][0]["reason"])
+
+    def test_unknown_section(self):
+        plan = {"changes": [
+            {
+                "section_id": "nonexistent_section",
+                "change_type": "replace",
+                "original_text": "foo",
+                "new_text": "bar",
+            },
+        ]}
+        result = compute_revision_diff(self.base, plan)
+        self.assertEqual(len(result["unresolvable"]), 1)
+        self.assertIn("not found", result["unresolvable"][0]["reason"])
+
+    def test_unknown_section_reason_names_the_real_sections(self):
+        plan = {"changes": [
+            {
+                "section_id": "第四章討論",
+                "change_type": "insert",
+                "original_text": "",
+                "new_text": "新增一段。",
+            },
+        ]}
+        result = compute_revision_diff(self.base, plan)
+        reason = result["unresolvable"][0]["reason"]
+        self.assertIn("discussion", reason)
+        self.assertIn("results", reason)
+
+    def test_empty_section_is_not_reported_missing(self):
+        # A heading with nothing under it exists and can be inserted into.
+        base = dict(self.base, appendix="")
+        plan = {"changes": [
+            {
+                "section_id": "appendix",
+                "change_type": "insert",
+                "original_text": "",
+                "new_text": "附錄內容。",
+            },
+        ]}
+        result = compute_revision_diff(base, plan)
+        self.assertEqual(result["unresolvable"], [])
+        self.assertEqual(result["preview"][0]["status"], "valid")
+
+    def test_unknown_change_type(self):
+        plan = {"changes": [
+            {
+                "section_id": "results",
+                "change_type": "merge",
+                "original_text": "388",
+                "new_text": "400",
+            },
+        ]}
+        result = compute_revision_diff(self.base, plan)
+        self.assertEqual(len(result["unresolvable"]), 1)
+
+    def test_context_preview_populated(self):
+        plan = {"changes": [
+            {
+                "section_id": "results",
+                "change_type": "replace",
+                "original_text": "5,171 nodes",
+                "new_text": "5,200 nodes",
+            },
+        ]}
+        result = compute_revision_diff(self.base, plan)
+        preview = result["preview"][0]
+        self.assertEqual(preview["status"], "valid")
+        self.assertTrue(len(preview["context_before"]) > 0)
+
+
+class DetectOverlappingChangesTests(unittest.TestCase):
+    """Test detect_overlapping_changes function."""
+
+    def test_no_overlap_different_sections(self):
+        changes = [
+            {"section_id": "intro", "change_type": "replace", "original_text": "hello"},
+            {"section_id": "results", "change_type": "replace", "original_text": "world"},
+        ]
+        base = {"intro": "hello world", "results": "hello world"}
+        conflicts = detect_overlapping_changes(changes, base)
+        self.assertEqual(len(conflicts), 0)
+
+    def test_overlap_same_section(self):
+        changes = [
+            {"section_id": "results", "change_type": "replace", "original_text": "hello world"},
+            {"section_id": "results", "change_type": "replace", "original_text": "world foo"},
+        ]
+        base = {"results": "hello world foo bar"}
+        conflicts = detect_overlapping_changes(changes, base)
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0], (0, 1))
+
+    def test_no_overlap_same_section(self):
+        changes = [
+            {"section_id": "results", "change_type": "replace", "original_text": "hello"},
+            {"section_id": "results", "change_type": "replace", "original_text": "bar"},
+        ]
+        base = {"results": "hello world foo bar"}
+        conflicts = detect_overlapping_changes(changes, base)
+        self.assertEqual(len(conflicts), 0)
+
+    def test_no_base_sections_returns_empty(self):
+        conflicts = detect_overlapping_changes([{"section_id": "a"}], None)
+        self.assertEqual(conflicts, [])
+
+
+class ComputeSectionDiffSummaryTests(unittest.TestCase):
+    """Test compute_section_diff_summary function."""
+
+    def test_identical_text(self):
+        text = "Line 1\nLine 2\nLine 3"
+        result = compute_section_diff_summary(text, text)
+        self.assertEqual(result["similarity_ratio"], 1.0)
+        self.assertEqual(result["added_lines"], 0)
+        self.assertEqual(result["removed_lines"], 0)
+
+    def test_small_change_high_ratio(self):
+        old = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5"
+        new = "Line 1\nLine 2 modified\nLine 3\nLine 4\nLine 5"
+        result = compute_section_diff_summary(old, new)
+        self.assertGreater(result["similarity_ratio"], 0.7)
+
+    def test_large_change_low_ratio(self):
+        old = "Original line 1\nOriginal line 2\nOriginal line 3"
+        new = "Completely different A\nCompletely different B\nCompletely different C"
+        result = compute_section_diff_summary(old, new)
+        self.assertLess(result["similarity_ratio"], 0.3)
+
+    def test_added_lines_counted(self):
+        old = "Line 1"
+        new = "Line 1\nLine 2\nLine 3"
+        result = compute_section_diff_summary(old, new)
+        self.assertGreater(result["added_lines"], 0)
+
+
+class WriteDiffReportTests(unittest.TestCase):
+    """Test write_diff_report function."""
+
+    def test_writes_json(self):
+        job_id = "test_diff_report"
+        run_dir = Path(tempfile.mkdtemp()) / f"diff-report--{job_id}"
+        run_dir.mkdir(parents=True, exist_ok=True)
+        register_job_run(job_id, run_dir)
+
+        try:
+            path = write_diff_report(job_id, {"test": True})
+            self.assertTrue(Path(path).exists())
+            with open(path) as f:
+                data = json.load(f)
+            self.assertTrue(data["test"])
+        finally:
+            import shutil
+            shutil.rmtree(run_dir, ignore_errors=True)
+
+
+class AgentToolRevisionTests(unittest.TestCase):
+    """Test submit_revision_plan and preview_revision_diff agent tools."""
+
+    def setUp(self):
+        self.job_id = "test_revision_tools"
+        self.tmpdir = tempfile.mkdtemp()
+        self.run_dir = Path(self.tmpdir) / f"revision-tools--{self.job_id}"
+        self.run_dir.mkdir(parents=True, exist_ok=True)
+        register_job_run(self.job_id, self.run_dir)
+
+        # Write base_document_sections
+        base = {"results": "We found 388 files with 5,171 nodes."}
+        (self.run_dir / "base_document_sections.json").write_text(
+            json.dumps(base), encoding="utf-8"
+        )
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_submit_validates_valid_plan(self):
+        plan = {"changes": [
+            {
+                "section_id": "results",
+                "change_type": "replace",
+                "original_text": "388 files",
+                "new_text": "400 files",
+            },
+        ]}
+        (self.run_dir / "revision_plan.json").write_text(
+            json.dumps(plan), encoding="utf-8"
+        )
+        result = submit_revision_plan(self.job_id)
+        self.assertEqual(result["status"], "ok")
+        self.assertIn("preview", result)
+
+    def test_submit_detects_invalid_plan(self):
+        plan = {"changes": [
+            {
+                "section_id": "results",
+                "change_type": "replace",
+                "original_text": "NONEXISTENT TEXT",
+                "new_text": "replacement",
+            },
+        ]}
+        (self.run_dir / "revision_plan.json").write_text(
+            json.dumps(plan), encoding="utf-8"
+        )
+        result = submit_revision_plan(self.job_id)
+        self.assertEqual(result["status"], "validation_failed")
+
+    def test_preview_is_readonly(self):
+        plan = {"changes": [
+            {
+                "section_id": "results",
+                "change_type": "replace",
+                "original_text": "388 files",
+                "new_text": "400 files",
+            },
+        ]}
+        (self.run_dir / "revision_plan.json").write_text(
+            json.dumps(plan), encoding="utf-8"
+        )
+        result = preview_revision_diff(self.job_id)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["valid_changes"], 1)
+        # Should NOT write any report file (readonly)
+        self.assertNotIn("diff_report_path", result)
+
+    def test_missing_base_document(self):
+        (self.run_dir / "base_document_sections.json").unlink()
+        result = submit_revision_plan(self.job_id)
+        self.assertEqual(result["status"], "error")
+
+    def test_missing_revision_plan(self):
+        result = submit_revision_plan(self.job_id)
+        self.assertEqual(result["status"], "error")
+
+
+if __name__ == "__main__":
+    unittest.main()

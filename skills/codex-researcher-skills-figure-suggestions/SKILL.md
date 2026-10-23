@@ -1,0 +1,147 @@
+---
+name: figure-suggestions
+description: "Recommend which figures a manuscript needs and where they go: chart type choice, figure versus table decisions, panel layout, placement, and a caption plan for each section. Triggers: suggest figures, what figures should I include, what charts, what chart type, figure ideas, which figure would best show this, table or figure, how many panels, suggest a visualization for this dataset, figure plan for the results section. It is advisory: it decides what to plot and hands off, and producing the actual plot from your data is visualization."
+---
+
+# Figure Suggestions
+
+Analyze manuscript content and recommend appropriate figures, chart types, panel layouts, and captions for each section.
+
+## Workflow
+
+1. **Read manuscript state**: load all current section files from `manuscript/`
+2. **Identify visualization opportunities**: scan each section for data, processes, comparisons, and relationships that benefit from visual presentation
+3. **Recommend figure type**: match content to the most effective visualization
+4. **Specify details**: caption, placement, panel layout, data requirements
+5. **Link to generation**: hand off to tikz-diagrams or note external tool requirements
+
+## Section-Specific Recommendations
+
+### Introduction
+- **Conceptual overview diagram:** high-level illustration of the research problem or domain
+- **Research gap visualization:** Venn diagram or comparison matrix showing what prior work covers and where the gap lies
+- **Scope diagram:** visual framing of what the paper addresses vs what it does not
+
+### Methods
+- **System architecture:** block diagram of overall approach / pipeline
+- **Experimental setup:** physical or logical setup of the experiment
+- **Data pipeline:** flow diagram from raw data to processed features
+- **Model architecture:** neural network layers, module connections, or algorithmic structure
+- **Study design:** participant flow (CONSORT), sampling strategy, or protocol diagram
+
+### Results
+Select chart type based on data characteristics:
+
+| Data Scenario | Recommended Chart | When to Use |
+|---------------|-------------------|-------------|
+| Comparison across categories | Bar chart (grouped or stacked) | Discrete categories, few groups |
+| Trend over time or sequence | Line chart | Continuous independent variable |
+| Relationship between variables | Scatter plot | Two continuous variables |
+| Distribution of values | Histogram, box plot, violin plot | Understanding spread and shape |
+| Correlation matrix | Heatmap | Many pairwise relationships |
+| Part-of-whole composition | Stacked bar or pie chart | Proportional data |
+| Performance across conditions | Grouped bar with error bars | Mean + variance comparisons |
+| Multi-metric comparison | Radar / spider chart | Comparing profiles across methods |
+| Spatial or grid data | Heatmap or contour plot | 2D structured data |
+| Qualitative examples | Sample grid | Model outputs, generated images |
+
+### Discussion
+- **Comparison frameworks:** tables or diagrams contrasting the proposed approach with prior work
+- **Conceptual models:** theoretical framework or causal diagrams
+- **Limitation visualization:** scope boundaries, failure cases, edge conditions
+- **Future work roadmap:** timeline or branching diagram of next steps
+
+## Figure Specification Format
+
+Present each suggestion in this structure:
+
+```
+Figure N: [Descriptive Title]
+  Section:    Methods / Results / Discussion
+  Type:       Bar chart / Architecture diagram / Heatmap / ...
+  Purpose:    What this figure communicates to the reader
+  Data needs: What data or information is required to create it
+  Layout:     Single panel / Multi-panel (a-d) / Full width / Half width
+  Caption:    "Proposed caption text following target journal style."
+  Placement:  After paragraph discussing [topic] in [section]
+  Generation: TikZ (hand off to tikz-diagrams) / matplotlib / external tool
+  Style:      default / nature / ieee (recommended preset, see references/figure-styles.md)
+```
+
+## Style Presets
+
+The `Style:` token has two distinct roles in this skill. Do not conflate them.
+
+- **Output field** (the line in the specification format above): the preset this skill *recommends* for each figure, carried downstream to visualization, tikz-diagrams, plotneuralnet, and latex-tables.
+- **Accepted input**: the invocation may carry an explicit `Style:` line, which pins the preset for every suggestion in the run.
+
+Presets (`default`, `nature`, `ieee`) are defined once in `references/figure-styles.md`. This skill does not duplicate those definitions; load that file when a preset is needed.
+
+### `Style:` line (accepted input)
+
+An explicit `Style:` line in the invocation outranks every other selector:
+
+```
+Suggest figures for my Results section.
+Style: nature
+```
+
+- `Style: nature`, `Style: ieee`: recommend that preset on every figure in the run.
+- `Style: default`, or no `Style:` line at all: the no-op path, exactly the current behavior. An omitted `Style:` line is never an error.
+- Any other value: do not guess and do not improvise a preset. Say it is not defined, list the presets that are (`default`, `nature`, `ieee`), and ask which to use.
+
+### Resolution order
+
+Presets resolve in one precedence order, highest first: **explicit `Style:` line > trigger phrase ("nature style", "IEEE format") > journal inference from `manuscript/config.yaml` (Nature portfolio titles map to `nature`, IEEE titles map to `ieee`) > `default`**. Whatever resolves becomes the `Style:` output field on every suggestion; state which preset was applied and why.
+
+Presets restyle only. A preset never changes which figure is suggested, what it plots, or its data.
+
+## Panel Layout Recommendations
+
+For multi-panel figures, suggest logical groupings:
+
+- **2 panels (a-b):** comparison between two conditions or before/after
+- **3 panels (a-c):** pipeline stages or three experimental conditions
+- **4 panels (a-d):** 2x2 grid for two factors with two levels each
+- **6 panels (a-f):** comprehensive results across multiple metrics or datasets
+
+Specify panel arrangement (rows x columns) and shared axis conventions (shared x-axis for time comparisons, shared y-axis for metric comparisons).
+
+## Caption Guidelines
+
+Generate captions that follow these academic conventions:
+1. **First sentence:** state what the figure shows (e.g., "Comparison of model accuracy across four benchmark datasets.")
+2. **Detail sentences:** describe panels, axes, color coding, statistical annotations
+3. **Interpretation hint:** brief note on the key takeaway (e.g., "Our method consistently outperforms baselines on datasets with >10k samples.")
+4. Adapt caption length and style to target journal requirements when `manuscript/config.yaml` specifies a journal
+
+## Placement Strategy
+
+- Place each figure as close as possible to its first textual reference
+- Ensure every figure is referenced in the text with `\ref{fig:label}`
+- Balance figures across sections (avoid overloading Results with 10 figures and leaving Methods with none)
+- Respect journal figure limits; if the journal allows N figures, prioritize the top N suggestions and recommend the rest as supplementary material
+
+## Priority Ranking
+
+Rank all suggestions by impact:
+1. **Essential**: the paper is incomplete without this figure (e.g., architecture diagram, main results)
+2. **Recommended**: significantly improves clarity or persuasiveness
+3. **Optional**: nice to have, could move to supplementary material
+
+## Related Skills
+
+- **tikz-diagrams**: generates TikZ/PGF code for suggested diagrams and charts
+- **latex-tables**: alternative when tabular format is more appropriate than a figure
+- **paper-drafting**: consumes figure references and integrates placement into section drafts
+- **journal-formatting**: provides figure format requirements (DPI, file type, color mode, size limits)
+- **image-prompt-crafting**: hand off conceptual illustrations and graphical abstracts to this skill for prompt crafting. Boundary: it never produces data or results figures; those stay with visualization, tikz-diagrams, plotneuralnet, and latex-tables.
+
+## Alt Text
+
+Alt text is a REQUIRED output when this skill emits a figure recommendation: each recommendation
+carries a draft alt-text line describing the DATA content the figure will show (the variables and the
+comparison), so the downstream skill that renders it (visualization, tikz-diagrams, plotneuralnet, or
+latex-tables) inherits a data description rather than inventing one. Describe data, never styling;
+preset variants share ONE data description plus at most a one-clause style note. See the Alt Text
+section of `references/figure-styles.md`.

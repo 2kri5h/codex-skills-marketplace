@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "report-workflow"
+version = "4.39.0"
+description = "Turn sources into a submission-ready report, with deterministic gates that block any claim not traceable to the evidence."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "0Smallcat0", email = "noiroao@gmail.com" }]
+keywords = [
+  "report-generation",
+  "docx",
+  "technical-writing",
+  "hallucination",
+  "hallucination-detection",
+  "llm",
+  "rag",
+  "faithfulness",
+  "grounding",
+  "evaluation",
+  "guardrails",
+  "provenance",
+  "trustworthy-ai",
+  "deterministic",
+  "mcp",
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Text Processing :: Linguistic",
+]
+dependencies = [
+  "pydantic>=2.0",
+  "python-docx>=1.0.0",
+  "filetype>=1.2.0",
+  "pdfplumber>=0.10.0",
+  "pandas>=2.0",
+  # pandas reads .xlsx through openpyxl and does not declare it, and the merged
+  # cell ranges are read from it directly. Undeclared, a clean install accepted
+  # a workbook as a supported source type and then could not open it.
+  "openpyxl>=3.1",
+  "pyyaml>=6.0",
+  "matplotlib>=3.7",
+  "Pillow>=10.0.0",
+]
+
+[project.optional-dependencies]
+notebook = ["notebooklm-py>=0.1.0"]
+mcp = ["mcp>=1.2,<2"]
+# Ships a pandoc binary in the wheel, so full-fidelity rendering needs no
+# system install. Kept an extra rather than a dependency: wheels exist for
+# win_amd64, macOS x86_64/arm64 and manylinux/musllinux only, and a core
+# dependency would make `pip install report-workflow` fail everywhere else.
+render = ["pypandoc-binary>=1.13"]
+
+[project.urls]
+Homepage = "https://github.com/0Smallcat0/report-workflow"
+Repository = "https://github.com/0Smallcat0/report-workflow"
+Changelog = "https://github.com/0Smallcat0/report-workflow/blob/master/CHANGELOG.md"
+"Design doc" = "https://github.com/0Smallcat0/report-workflow/blob/master/docs/DESIGN.md"
+Issues = "https://github.com/0Smallcat0/report-workflow/issues"
+
+[project.scripts]
+report-workflow = "report_workflow.cli:main"
+report-workflow-mcp = "report_workflow.mcp_server:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = {find = {where = ["src"]}}
+include-package-data = true
+
+[tool.setuptools.package-data]
+report_workflow = [
+  "blueprints/*.yaml",
+  "configs/*.json",
+  "configs/style_profiles/*.json",
+  "guidelines/*.json",
+  "templates/*.docx",
+  "templates/*.md",
+  "prompts/*.py",
+]

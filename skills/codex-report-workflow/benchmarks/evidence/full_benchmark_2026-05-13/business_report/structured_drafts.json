@@ -1,0 +1,152 @@
+{
+  "generated_by": "scripts.run_report_benchmarks",
+  "benchmark_fixture": "benchmarks\\fixtures\\controlled_source.md",
+  "sections": {
+    "executive_summary": {
+      "title": "Executive Summary",
+      "sentences": [
+        {
+          "text": "The structured workflow pilot is best read as a bounded evidence-handling and QA thinking project: it converted intake notes into auditable report artifacts, compared a controlled procedure, recorded measurement signals, bounded its claims, treated satisfaction as supportive evidence, and named adoption assumptions.",
+          "claim_ids": [
+            "c_context",
+            "c_method",
+            "c_measurement",
+            "c_limit",
+            "c_satisfaction",
+            "c_proposal"
+          ],
+          "evidence_ids": [
+            "E_1b728a3d_619f04e311",
+            "E_1b728a3d_63f592e104",
+            "E_1b728a3d_6bbbb16a9b",
+            "E_1b728a3d_b72befbf78",
+            "E_1b728a3d_ed6453069f",
+            "E_1b728a3d_7067b4a674"
+          ],
+          "citation_ids": [
+            "E_1b728a3d_619f04e311",
+            "E_1b728a3d_63f592e104",
+            "E_1b728a3d_6bbbb16a9b",
+            "E_1b728a3d_b72befbf78",
+            "E_1b728a3d_ed6453069f",
+            "E_1b728a3d_7067b4a674"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "findings": {
+      "title": "Key Findings",
+      "sentences": [
+        {
+          "text": "Across the same 42 notes, median processing time fell from 28 minutes per note under the manual baseline to 20 minutes under the structured workflow, the share of notes needing reviewer repair fell from 7.5% to 4.1%, and reviewer satisfaction rose from 71% to 84%.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_1b728a3d_6bbbb16a9b"
+          ],
+          "citation_ids": [
+            "E_1b728a3d_6bbbb16a9b"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 1 compares the two conditions directly: the structured workflow brings median processing time down from 28 to 20 minutes per note. [FIGURE:1]\n\nFigure 1: Median processing time per note, manual baseline versus structured workflow (minutes).",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_1b728a3d_6bbbb16a9b"
+          ],
+          "citation_ids": [
+            "E_1b728a3d_6bbbb16a9b"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 2 traces the month-by-month trend across the pilot period, with median processing time falling as the structured workflow settled in. [FIGURE:2]\n\nFigure 2: Median processing time per note by month over the pilot period (minutes).",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_1b728a3d_6bbbb16a9b"
+          ],
+          "citation_ids": [
+            "E_1b728a3d_6bbbb16a9b"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 3 sets intake complexity against review effort, showing that more complex notes demanded proportionally more reviewer attention. [FIGURE:3]\n\nFigure 3: Review effort score versus intake complexity score for the sampled notes.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_1b728a3d_6bbbb16a9b"
+          ],
+          "citation_ids": [
+            "E_1b728a3d_6bbbb16a9b"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 4 shows the spread of per-note processing times within each condition, not just the medians. [FIGURE:4]\n\nFigure 4: Distribution of per-note processing minutes under each condition.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_1b728a3d_6bbbb16a9b"
+          ],
+          "citation_ids": [
+            "E_1b728a3d_6bbbb16a9b"
+          ],
+          "wording_strength": "hedged"
+        },
+        {
+          "text": "Figure 5 lists the adoption parameters behind the proposal: two onboarding sessions, a one-week shadow period, and USD 4,800 in setup cost. [FIGURE:5]\n\nFigure 5: Adoption planning parameters from the proposal inputs.",
+          "claim_ids": [
+            "c_measurement"
+          ],
+          "evidence_ids": [
+            "E_1b728a3d_6bbbb16a9b"
+          ],
+          "citation_ids": [
+            "E_1b728a3d_6bbbb16a9b"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "recommendations": {
+      "title": "Recommendations",
+      "sentences": [
+        {
+          "text": "A cautious next step is to evaluate adoption with reviewer training, onboarding sessions, and the same evidence-boundary discipline used in the pilot.",
+          "claim_ids": [
+            "c_proposal",
+            "c_satisfaction"
+          ],
+          "evidence_ids": [
+            "E_1b728a3d_7067b4a674",
+            "E_1b728a3d_ed6453069f"
+          ],
+          "citation_ids": [
+            "E_1b728a3d_7067b4a674",
+            "E_1b728a3d_ed6453069f"
+          ],
+          "wording_strength": "hedged"
+        }
+      ]
+    },
+    "appendix": {
+      "title": "Appendix",
+      "sentences": []
+    }
+  },
+  "_contract": {
+    "job_id": "run_90aaa136",
+    "evidence_ledger_hash": "d40300c0456eeb37",
+    "source_registry_hash": "f3493997243fa203"
+  }
+}

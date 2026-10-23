@@ -1,0 +1,4 @@
+interface:
+  display_name: "Document Formatting"
+  short_description: "Professional academic editing and report formatting"
+  default_prompt: "Use $document-formatting to professionally edit and format my report in the required Word or LaTeX template."

@@ -1,0 +1,34 @@
+{
+  "rules": [
+    {
+      "id": "SPIRIT_CONSORT",
+      "condition": {
+        "keywords": ["RCT", "randomized controlled trial", "clinical trial", "randomised"]
+      },
+      "selected_guidelines": ["SPIRIT", "CONSORT"]
+    },
+    {
+      "id": "STROBE",
+      "condition": {
+        "keywords": ["observational", "cohort", "case-control", "cross-sectional"]
+      },
+      "selected_guidelines": ["STROBE"]
+    },
+    {
+      "id": "PRISMA",
+      "condition": {
+        "keywords": ["systematic review", "meta-analysis", "meta analysis", "systematic search"]
+      },
+      "selected_guidelines": ["PRISMA"]
+    }
+  ],
+  "defaults": {
+    "engineering_lab_report": ["CHINESE_ENGINEERING"],
+    "academic_paper": [],
+    "business_report": [],
+    "proposal": [],
+    "admissions_report": [],
+    "admissions_project_report": [],
+    "custom": []
+  }
+}

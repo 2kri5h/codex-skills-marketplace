@@ -1,0 +1,763 @@
+"""Aggregation the tool performs, instead of aggregation the author registers.
+
+Every scalar operation answers one question, so a six-band table with three
+columns cost eighteen registrations. A real run spent 117 of them to produce
+three tables, and the report that came out had 238 numbers in it against 703
+in an unassisted write-up of the same files. The shape of the request was the
+cost, not the analysis.
+
+So: one request returns a whole grid, two files can be joined before it is
+grouped, and the obvious crossings are computed at intake without anybody
+asking. What is measured here is the arithmetic in each cell, the provenance
+that travels with it, and the fault that stranded an earlier run — a ledger
+whose bytes moved on every rerun, which made every artifact stamped against it
+stale and left nothing publishable.
+"""
+import json
+import tempfile
+import unittest
+import unittest.mock
+from datetime import datetime, timezone
+from pathlib import Path
+
+from report_workflow.derived_evidence import (
+    build_requested_units,
+    dataset_summary_units,
+    join_datasets,
+    structured_datasets,
+)
+from report_workflow.nodes.source_tables import (
+    collect_source_tables,
+    replace_table_placeholders,
+)
+
+CREATED_AT = datetime(2026, 8, 7, tzinfo=timezone.utc).isoformat()
+
+#: Six listings whose prices straddle three bands, so a band table has
+#: something to say in every row and the arithmetic is checkable by hand.
+PRODUCTS = [
+    {"asin": "A1", "brand": "DJI", "price": "$20.00", "rating": "4.5", "category": "camera"},
+    {"asin": "A2", "brand": "DJI", "price": "$25.00", "rating": "3.0", "category": "camera"},
+    {"asin": "A3", "brand": "Autel", "price": "$60.00", "rating": "4.0", "category": "camera"},
+    {"asin": "A4", "brand": "Autel", "price": "$80.00", "rating": "5.0", "category": "racing"},
+    {"asin": "A5", "brand": "Ryze", "price": "$150.00", "rating": "3.5", "category": "racing"},
+    {"asin": "A6", "brand": "Ryze", "price": "", "rating": "4.0", "category": "racing"},
+]
+
+REVIEWS = [
+    {"review_id": "R1", "asin": "A1", "review_rating": "5.0"},
+    {"review_id": "R2", "asin": "A1", "review_rating": "3.0"},
+    {"review_id": "R3", "asin": "A5", "review_rating": "2.0"},
+    {"review_id": "R4", "asin": "ZZ", "review_rating": "1.0"},
+]
+
+
+def _source(source_id: str, file_name: str, rows: list[dict]) -> dict:
+    return {
+        "source_id": source_id,
+        "file_name": file_name,
+        "file_path": file_name,
+        "file_type": "csv",
+        "parsed_content": [
+            {"block_type": "csv_row", "content": json.dumps(row, ensure_ascii=False)}
+            for row in rows
+        ],
+    }
+
+
+REGISTRY = [
+    _source("s1", "products.csv", PRODUCTS),
+    _source("s2", "reviews.csv", REVIEWS),
+]
+
+
+def _only(units: list[dict], evidence_id: str) -> dict:
+    matches = [unit for unit in units if unit["evidence_id"] == evidence_id]
+    assert len(matches) == 1, f"{evidence_id}: {[u['evidence_id'] for u in units]}"
+    return matches[0]
+
+
+def _cells(unit: dict) -> dict[str, list[str]]:
+    return {row[0]: row[1:] for row in unit["table_grid"]["rows"]}
+
+
+class OneRequestReturnsATableTests(unittest.TestCase):
+    def _band_table(self) -> dict:
+        units, problems = build_requested_units(
+            [{
+                "id": "band",
+                "source": "products.csv",
+                "label": "Price band against rating",
+                "group_by": {"column": "price", "buckets": [0, 50, 100], "label": "Band"},
+                "measures": [
+                    {"op": "count", "label": "Listings"},
+                    {"op": "mean", "column": "rating", "label": "Mean rating"},
+                    {"op": "share", "rows": "rating < 4", "label": "Under four"},
+                    {"op": "share", "label": "Share of catalogue"},
+                ],
+            }],
+            REGISTRY,
+            CREATED_AT,
+        )
+        self.assertEqual(problems, [])
+        return _only(units, "E_D_band")
+
+    def test_one_registration_produces_every_band(self):
+        unit = self._band_table()
+        cells = _cells(unit)
+        # 0-50 holds A1 and A2, 50-100 holds A3 and A4, 100+ holds A5. A6 has
+        # no price and is reported as ungrouped rather than dropped in silence.
+        #
+        # Labelled by what each band covers, not by where it was cut: these
+        # prices are whole numbers, so the band cut at [0, 50) holds 0 to 49
+        # and says so. A row label is the string an author copies into prose,
+        # and "0–50" over rows that contain no 50 is a claim about the data.
+        self.assertEqual(
+            [row[0] for row in unit["table_grid"]["rows"]],
+            ["0–49", "50–99", "100+", "All"],
+        )
+        self.assertEqual(cells["0–49"][0], "2")
+        self.assertEqual(cells["50–99"][0], "2")
+        self.assertEqual(cells["100+"][0], "1")
+        self.assertEqual(unit["derivation"]["rows_ungrouped"], 1)
+        # The author's cut is still recorded exactly as given.
+        self.assertEqual(unit["derivation"]["buckets"], [0.0, 50.0, 100.0])
+
+    def test_each_cell_is_the_arithmetic_over_its_own_group(self):
+        cells = _cells(self._band_table())
+        self.assertEqual(cells["0–49"][1], "3.75")    # (4.5 + 3.0) / 2
+        self.assertEqual(cells["50–99"][1], "4.50")   # (4.0 + 5.0) / 2
+        self.assertEqual(cells["100+"][1], "3.50")
+
+    def test_a_filtered_share_is_a_rate_inside_the_group(self):
+        cells = _cells(self._band_table())
+        self.assertEqual(cells["0–49"][2], "50.00%")   # A2 of {A1, A2}
+        self.assertEqual(cells["50–99"][2], "0.00%")
+        self.assertEqual(cells["100+"][2], "100.00%")
+
+    def test_an_unfiltered_share_is_the_group_against_the_whole(self):
+        # Taken against its own group this is 100% in every row, which is a
+        # column of noise; the only reading that says anything is the group's
+        # weight in the selection.
+        cells = _cells(self._band_table())
+        self.assertEqual(cells["0–49"][3], "33.33%")   # 2 of 6
+        self.assertEqual(cells["100+"][3], "16.67%")
+
+    def test_the_content_states_every_cell_so_a_gate_can_find_it(self):
+        content = self._band_table()["content"]
+        for value in ("3.75", "4.50", "50.00%", "0–49", "100+"):
+            self.assertIn(value, content)
+
+    def test_a_categorical_column_needs_no_buckets(self):
+        units, problems = build_requested_units(
+            [{
+                "id": "mix",
+                "source": "products.csv",
+                "group_by": {"column": "category"},
+                "measures": [{"op": "count"}, {"op": "median", "column": "price"}],
+            }],
+            REGISTRY,
+            CREATED_AT,
+        )
+        self.assertEqual(problems, [])
+        cells = _cells(_only(units, "E_D_mix"))
+        self.assertEqual(cells["camera"][0], "3")
+        self.assertEqual(cells["racing"][0], "3")
+
+    def test_bucket_edges_are_the_authors_and_are_checked(self):
+        _units, problems = build_requested_units(
+            [{
+                "id": "bad",
+                "source": "products.csv",
+                "group_by": {"column": "price", "buckets": [100, 50]},
+                "measures": [{"op": "count"}],
+            }],
+            REGISTRY,
+            CREATED_AT,
+        )
+        self.assertEqual(len(problems), 1)
+        self.assertIn("increase", problems[0]["error"])
+
+    def test_a_grouped_request_without_measures_says_so(self):
+        _units, problems = build_requested_units(
+            [{"id": "nope", "source": "products.csv",
+              "group_by": {"column": "category"}}],
+            REGISTRY,
+            CREATED_AT,
+        )
+        self.assertEqual(len(problems), 1)
+        self.assertIn("measures", problems[0]["error"])
+
+    def test_the_derivation_records_how_each_column_was_built(self):
+        derivation = self._band_table()["derivation"]
+        self.assertEqual(derivation["method"], "group_table")
+        self.assertEqual(derivation["group_by"], "price")
+        self.assertEqual(derivation["buckets"], [0.0, 50.0, 100.0])
+        self.assertEqual(
+            [measure["op"] for measure in derivation["measures"]],
+            ["count", "mean", "share", "share"],
+        )
+
+
+class JoinedSourcesTests(unittest.TestCase):
+    def _joined(self) -> dict:
+        units, problems = build_requested_units(
+            [{
+                "id": "band_reviews",
+                "source": ["reviews.csv", "products.csv"],
+                "join": {"on": "asin", "how": "inner"},
+                "group_by": {"column": "price", "buckets": [0, 50, 100]},
+                "measures": [
+                    {"op": "count", "label": "Reviews"},
+                    {"op": "mean", "column": "review_rating", "label": "Mean stars"},
+                ],
+            }],
+            REGISTRY,
+            CREATED_AT,
+        )
+        self.assertEqual(problems, [])
+        return _only(units, "E_D_band_reviews")
+
+    def test_a_figure_neither_file_states_becomes_available(self):
+        # Price lives in products, the star rating lives in reviews, and "what
+        # do buyers say about each price band" lives in neither.
+        cells = _cells(self._joined())
+        self.assertEqual(cells["0–49"][0], "2")
+        self.assertEqual(cells["0–49"][1], "4.00")   # (5.0 + 3.0) / 2
+        self.assertEqual(cells["100+"][1], "2.00")
+
+    def test_rows_that_find_no_partner_are_counted_not_swallowed(self):
+        unit = self._joined()
+        join = unit["derivation"]["join"]
+        self.assertEqual(join["left_unmatched"], 1)    # R4 names no listing
+        self.assertEqual(join["joined_rows"], 3)
+        self.assertEqual(join["right_unmatched"], 4)   # A2, A3, A4, A6
+        self.assertIn("found no partner", unit["content"])
+
+    def test_a_column_present_in_both_files_is_renamed_not_overwritten(self):
+        datasets = {dataset.file_name: dataset for dataset in structured_datasets(REGISTRY)}
+        frame = join_datasets(
+            datasets["reviews.csv"], datasets["products.csv"], {"on": "asin"}
+        )
+        self.assertEqual(frame.join_info["renamed_columns"], {})
+        self.assertIn("price", frame.columns)
+
+        other = structured_datasets([_source("s3", "extra.csv", [
+            {"asin": "A1", "rating": "1.0"}, {"asin": "A5", "rating": "2.0"},
+        ])])[0]
+        collided = join_datasets(datasets["products.csv"], other, {"on": "asin"})
+        self.assertEqual(
+            collided.join_info["renamed_columns"], {"rating": "rating__extra"}
+        )
+        first = collided.rows[0]
+        self.assertEqual(first["rating"], "4.5")        # the left file's value
+        self.assertEqual(first["rating__extra"], "1.0")
+
+    def test_two_sources_without_a_join_are_refused(self):
+        _units, problems = build_requested_units(
+            [{"id": "x", "source": ["reviews.csv", "products.csv"],
+              "group_by": {"column": "price", "buckets": [0, 50]},
+              "measures": [{"op": "count"}]}],
+            REGISTRY,
+            CREATED_AT,
+        )
+        self.assertEqual(len(problems), 1)
+        self.assertIn("join", problems[0]["error"])
+
+    def test_only_inner_joins_are_offered(self):
+        _units, problems = build_requested_units(
+            [{"id": "x", "source": ["reviews.csv", "products.csv"],
+              "join": {"on": "asin", "how": "left"},
+              "group_by": {"column": "price", "buckets": [0, 50]},
+              "measures": [{"op": "count"}]}],
+            REGISTRY,
+            CREATED_AT,
+        )
+        self.assertEqual(len(problems), 1)
+        self.assertIn("inner", problems[0]["error"])
+
+
+class CrossTablesNobodyAskedForTests(unittest.TestCase):
+    def test_each_category_column_is_crossed_with_the_numeric_ones(self):
+        tables = [
+            unit for unit in dataset_summary_units(REGISTRY, CREATED_AT)
+            if unit.get("table_grid")
+        ]
+        crossed = {unit["derivation"]["group_by"] for unit in tables}
+        self.assertIn("category", crossed)
+        self.assertIn("brand", crossed)
+        by_category = next(
+            unit for unit in tables if unit["derivation"]["group_by"] == "category"
+        )
+        headers = by_category["table_grid"]["headers"]
+        self.assertIn("rows", headers)
+        self.assertTrue(any("rating" in header for header in headers))
+
+    def test_an_automatic_table_never_invents_a_numeric_band(self):
+        # Where to cut a price axis is the finding, not an input to it.
+        for unit in dataset_summary_units(REGISTRY, CREATED_AT):
+            self.assertNotEqual(unit["derivation"].get("grouping"), "buckets")
+
+    def test_who_asked_is_recorded_so_the_manual_burden_can_be_counted(self):
+        auto = dataset_summary_units(REGISTRY, CREATED_AT)
+        self.assertTrue(all(unit["origin"] == "auto" for unit in auto))
+        requested, _problems = build_requested_units(
+            [{"id": "n", "source": "products.csv", "op": "count"}],
+            REGISTRY,
+            CREATED_AT,
+        )
+        self.assertEqual([unit["origin"] for unit in requested], ["requested"])
+
+
+class DerivedTablesReachTheDocumentTests(unittest.TestCase):
+    def _units(self) -> list[dict]:
+        units, problems = build_requested_units(
+            [{"id": "band", "source": "products.csv",
+              "group_by": {"column": "price", "buckets": [0, 50, 100]},
+              "measures": [{"op": "count"}]}],
+            REGISTRY,
+            CREATED_AT,
+        )
+        self.assertEqual(problems, [])
+        return units
+
+    def test_a_grouped_table_is_placeable_with_a_table_marker(self):
+        units = self._units()
+        tables = collect_source_tables(units)
+        # The evidence id always works; the author's own id is the name they
+        # will reach for, so it resolves too when nothing else claims it.
+        self.assertIn("E_D_band", tables)
+        self.assertIn("band", tables)
+
+        markdown, placed, unresolved = replace_table_placeholders(
+            "Prices split as follows.\n\n[TABLE:band Price bands]\n", units
+        )
+        self.assertEqual((placed, unresolved), (1, []))
+        self.assertIn("| 0–49 |", markdown)
+        self.assertIn("Table 1. Price bands", markdown)
+
+    def test_the_placed_table_carries_where_its_numbers_came_from(self):
+        markdown, _placed, _unresolved = replace_table_placeholders(
+            "[TABLE:band]", self._units()
+        )
+        self.assertIn("Source: products.csv", markdown)
+
+
+class LedgerBytesStayPutTests(unittest.TestCase):
+    """The regression that had no test.
+
+    ``created_at`` was regenerated on every run, so every derived line changed,
+    so the ledger hash changed, so every artifact stamped against it was stale
+    — and no run that had registered a derivation could publish. It was fixed
+    by carrying the first-seen timestamp forward, and nothing guarded the fix.
+    """
+
+    def test_registering_the_same_derivations_twice_leaves_the_ledger_alone(self):
+        from report_workflow.nodes.derived_evidence import apply_derived_evidence
+
+        requests = [
+            {"id": "n", "source": "products.csv", "op": "count"},
+            {"id": "band", "source": "products.csv",
+             "group_by": {"column": "price", "buckets": [0, 50, 100]},
+             "measures": [{"op": "count"}, {"op": "mean", "column": "rating"}]},
+        ]
+        with tempfile.TemporaryDirectory() as workspace:
+            run_dir = Path(workspace) / "job"
+            run_dir.mkdir()
+            (run_dir / "derived_evidence.json").write_text(
+                json.dumps({"derivations": requests}), encoding="utf-8"
+            )
+            ledger = run_dir / "evidence_ledger.jsonl"
+            ledger.write_text("", encoding="utf-8")
+
+            class _State:
+                job_id = "job"
+                spec = {"user_prompt": "write a market report"}
+                sources = {
+                    "evidence_ledger_path": str(ledger),
+                    "source_registry": REGISTRY,
+                }
+
+            with unittest.mock.patch(
+                "report_workflow.nodes.derived_evidence.WORKFLOW_RUNS_DIR",
+                Path(workspace),
+            ):
+                apply_derived_evidence(_State())
+                first = ledger.read_bytes()
+                apply_derived_evidence(_State())
+                second = ledger.read_bytes()
+
+        self.assertTrue(first, "the ledger should not be empty")
+        self.assertEqual(first, second)
+
+
+class BrickLayingIsRefusedTests(unittest.TestCase):
+    """The grouped form existing was not enough to get it used.
+
+    Two acceptance runs registered 22 and then 47 derivations against the same
+    three files. The second was 41 scalars and 6 tables, and six of those
+    scalars were mean-and-negative-rate across three price bands: a two by
+    three table, spelled out. Nothing was wrong with any single request, which
+    is exactly why nothing stopped it — every one returns a working number, and
+    the author never finds out the table was one call away.
+    """
+
+    def _problems(self, requests: list[dict]) -> dict[str, str]:
+        _units, problems = build_requested_units(requests, REGISTRY, CREATED_AT)
+        return {problem["id"]: problem["error"] for problem in problems}
+
+    def test_the_same_shape_three_times_over_is_one_table(self):
+        problems = self._problems([
+            {"id": "low", "source": "products.csv", "op": "mean",
+             "column": "rating", "rows": "price<50"},
+            {"id": "mid", "source": "products.csv", "op": "mean",
+             "column": "rating", "rows": "price>=50 & price<100"},
+            {"id": "high", "source": "products.csv", "op": "mean",
+             "column": "rating", "rows": "price>=100"},
+        ])
+        self.assertEqual(sorted(problems), ["high", "low", "mid"])
+        message = problems["low"]
+        self.assertIn("group_by", message)
+        self.assertIn('"column": "price"', message)
+        # A numeric slice needs edges the author picks; the refusal says so
+        # rather than choosing them.
+        self.assertIn("buckets", message)
+
+    def test_the_refusal_carries_the_request_that_replaces_it(self):
+        problems = self._problems([
+            {"id": "a", "source": "products.csv", "op": "count", "rows": "category=camera"},
+            {"id": "b", "source": "products.csv", "op": "count", "rows": "category=racing"},
+            {"id": "c", "source": "products.csv", "op": "count", "rows": "category=toy"},
+        ])
+        replacement = json.loads(
+            problems["a"][problems["a"].index("{"):problems["a"].rindex("}") + 1]
+        )
+        self.assertEqual(replacement["group_by"], {"column": "category"})
+        self.assertEqual(replacement["measures"], [{"op": "count"}])
+        # A categorical grouping needs no edges, and the message must not
+        # invent any.
+        self.assertNotIn("buckets", problems["a"])
+        _units, _problems = build_requested_units(
+            [{**replacement, "id": "mix"}], REGISTRY, CREATED_AT
+        )
+        self.assertEqual(_problems, [])
+
+    def test_two_of_a_shape_is_a_comparison_not_a_table(self):
+        self.assertEqual(self._problems([
+            {"id": "a", "source": "products.csv", "op": "count", "rows": "category=camera"},
+            {"id": "b", "source": "products.csv", "op": "count", "rows": "category=racing"},
+        ]), {})
+
+    def test_unrelated_scalars_are_left_alone(self):
+        self.assertEqual(self._problems([
+            {"id": "n", "source": "products.csv", "op": "count"},
+            {"id": "hhi", "source": "products.csv", "op": "hhi", "column": "brand"},
+            {"id": "med", "source": "products.csv", "op": "median", "column": "price"},
+            {"id": "one", "source": "products.csv", "op": "max",
+             "column": "price", "rows": "brand=DJI"},
+        ]), {})
+
+
+class TheBriefLeadsWithTheBuiltTablesTests(unittest.TestCase):
+    def test_ready_tables_are_listed_before_the_column_summaries(self):
+        from report_workflow.nodes.agent_tasks import _derived_stats_guidance
+
+        with tempfile.TemporaryDirectory() as workspace:
+            ledger = Path(workspace) / "evidence_ledger.jsonl"
+            ledger.write_text(
+                "\n".join(
+                    json.dumps(unit, ensure_ascii=False)
+                    for unit in dataset_summary_units(REGISTRY, CREATED_AT)
+                ) + "\n",
+                encoding="utf-8",
+            )
+            guidance = _derived_stats_guidance(str(ledger))
+
+        tables_at = guidance.index("Tables already built and ready to place")
+        summaries_at = guidance.index("Single-column summaries computed at intake")
+        self.assertLess(tables_at, summaries_at)
+        # The marker to place one has to be in the section, or the author has
+        # a list of tables and no way to use them.
+        self.assertIn("[TABLE:", guidance[tables_at:summaries_at])
+
+
+class BandLabelsSayWhatTheyHoldTests(unittest.TestCase):
+    """A half-open band labelled 1-3 contains 1 and 2, and said neither.
+
+    An author read the table, wrote 「1-2 星」 -- correct -- and the content check
+    refused it: the digit 2 appears nowhere in the evidence. The identical phrase
+    passed when it cited a different table, solely because that table's column
+    header happened to spell the range out. Same fact, same words, opposite
+    verdict depending on a header.
+    """
+
+    RATINGS = [
+        {"review_id": f"R{index}", "review_rating": str(rating)}
+        for index, rating in enumerate([1, 1, 2, 3, 3, 4, 5, 5, 5, 5])
+    ]
+
+    def _unit(self, buckets: list, zh: bool = True) -> dict:
+        units, problems = build_requested_units(
+            [{"id": "band", "source": "reviews.csv",
+              "group_by": {"column": "review_rating", "buckets": buckets},
+              "measures": [{"op": "count"}]}],
+            [_source("s", "reviews.csv", self.RATINGS)],
+            CREATED_AT,
+            zh=zh,
+        )
+        self.assertEqual(problems, [])
+        return units[0]
+
+    def test_an_integer_band_states_the_values_it_covers(self):
+        unit = self._unit([1, 3, 4, 5])
+        self.assertEqual(
+            unit["derivation"]["band_members"],
+            ["1 至 2", "3", "4", "5 及以上"],
+        )
+        # The label is the coverage, not the cut. Stating the membership below
+        # the table was not enough on its own: a delivered report still carried
+        # 「1-3 星區間 49 則評論」 over 37 one-star and 12 two-star rows,
+        # because the row label is what an author copies.
+        self.assertEqual(
+            [row[0] for row in unit["table_grid"]["rows"]],
+            ["1–2", "3", "4", "5+", "合計"],
+        )
+        # The figure the author will write has to be findable in the text.
+        self.assertIn("1–2=1 至 2", unit["content"])
+        self.assertIn("2", unit["content"])
+
+    def test_a_column_with_fractions_gets_no_membership_claim(self):
+        # Spelling a price band as "0 to 29" when the data holds 29.99 would be
+        # a statement about the band that is false about the data.
+        prices = [{"asin": f"A{i}", "price": p} for i, p in enumerate(
+            ["$10.50", "$20.99", "$40.00", "$70.25"]
+        )]
+        units, problems = build_requested_units(
+            [{"id": "p", "source": "p.csv",
+              "group_by": {"column": "price", "buckets": [0, 30, 60]},
+              "measures": [{"op": "count"}]}],
+            [_source("s", "p.csv", prices)],
+            CREATED_AT,
+            zh=True,
+        )
+        self.assertEqual(problems, [])
+        self.assertNotIn("band_members", units[0]["derivation"])
+        self.assertNotIn("實際涵蓋", units[0]["content"])
+
+    def test_english_membership_reads_as_english(self):
+        self.assertIn("1 to 2", self._unit([1, 3, 4, 5], zh=False)["content"])
+
+
+class ComparingTwoComputedFiguresTests(unittest.TestCase):
+    """A multiple and a percentage-point gap, as figures that can be cited.
+
+    Neither was expressible. An author wanting "the premium band draws 13.6x
+    the reviews of the budget band" could write it with no citation, which FE
+    correctly blocks, or delete it — and across eight recorded runs FE blocked
+    41 claims for a number the evidence does not state.
+    """
+
+    BAND = {
+        "id": "band", "source": "products.csv",
+        "group_by": {"column": "price", "buckets": [0, 50, 100], "label": "Band"},
+        "measures": [
+            {"op": "count", "label": "Listings"},
+            {"op": "share", "rows": "category=camera", "label": "Camera share"},
+        ],
+    }
+
+    def _build(self, *requests: dict, zh: bool = False):
+        return build_requested_units(
+            [self.BAND, *requests], REGISTRY, CREATED_AT, zh=zh
+        )
+
+    def test_two_rows_of_a_table_already_built_need_no_second_registration(self):
+        units, problems = self._build({
+            "id": "cheap_vs_premium", "op": "ratio", "source": "band",
+            "column": "Listings", "numerator_group": "0–49",
+            "denominator_group": "100+",
+        })
+        self.assertEqual(problems, [])
+        # Two listings under 50 ($20, $25); one at 100 or above ($150).
+        self.assertIn("is 2x", _only(units, "E_D_cheap_vs_premium")["content"])
+
+    def test_the_table_can_be_named_by_its_evidence_id(self):
+        _units, problems = self._build({
+            "id": "by_evidence_id", "op": "ratio", "source": "E_D_band",
+            "column": "Listings", "numerator_group": "0–49",
+            "denominator_group": "50–99",
+        })
+        self.assertEqual(problems, [])
+
+    def test_a_hyphen_typed_for_an_en_dash_still_finds_the_row(self):
+        """Refusing "0-49" against a row called "0–49" is the tool insisting on
+        its own typography."""
+        _units, problems = self._build({
+            "id": "dashes", "op": "ratio", "source": "band", "column": "Listings",
+            "numerator_group": "0-49", "denominator_group": "50-99",
+        })
+        self.assertEqual(problems, [])
+
+    def test_two_registered_derivations_compare_across_statistics(self):
+        units, problems = self._build(
+            {"id": "cameras", "source": "products.csv", "rows": "category=camera",
+             "op": "count"},
+            {"id": "listings", "source": "products.csv", "op": "count"},
+            {"id": "camera_share", "op": "ratio", "numerator": "cameras",
+             "denominator": "listings", "decimals": 2},
+        )
+        self.assertEqual(problems, [])
+        # 3 of 6, rounded to the two places the request asked for.
+        self.assertIn("is 0.50x", _only(units, "E_D_camera_share")["content"])
+
+    def test_both_operands_are_stated_in_the_evidence_text(self):
+        """A row saying only "2" grounds the multiple and nothing the sentence
+        around it will say."""
+        units, _problems = self._build({
+            "id": "stated", "op": "ratio", "source": "band", "column": "Listings",
+            "numerator_group": "0–49", "denominator_group": "100+",
+        })
+        content = _only(units, "E_D_stated")["content"]
+        self.assertIn("0–49 Listings = 2", content)
+        self.assertIn("100+ Listings = 1", content)
+
+    def test_expect_is_checked_against_the_comparison_too(self):
+        _units, problems = self._build({
+            "id": "wrong", "op": "ratio", "source": "band", "column": "Listings",
+            "numerator_group": "0–49", "denominator_group": "50–99", "expect": 9,
+        })
+        self.assertEqual([problem["id"] for problem in problems], ["wrong"])
+        self.assertIn("expects 9", problems[0]["error"])
+
+    def test_pp_diff_refuses_two_quantities_that_are_not_percentages(self):
+        """"8.5 percentage points" between two counts is a unit the figures do
+        not have."""
+        _units, problems = self._build({
+            "id": "not_pct", "op": "pp_diff", "source": "band",
+            "column": "Listings", "numerator_group": "0–49",
+            "denominator_group": "50–99",
+        })
+        self.assertEqual([problem["id"] for problem in problems], ["not_pct"])
+        self.assertIn("percentage points", problems[0]["error"])
+
+    def test_pp_diff_over_two_shares_states_the_gap_once(self):
+        units, problems = self._build({
+            "id": "camera_gap", "op": "pp_diff", "source": "band",
+            "column": "Camera share", "numerator_group": "0–49",
+            "denominator_group": "50–99", "decimals": 1,
+        })
+        self.assertEqual(problems, [])
+        content = _only(units, "E_D_camera_gap")["content"]
+        # Both listings under $50 are cameras; one of the two from $50 to $99.
+        self.assertIn("is 50.0 percentage points", content)
+        # Not "50.0% percentage points" — the unit is carried by the words.
+        self.assertNotIn("% percentage points", content)
+
+    def test_a_comparison_naming_a_figure_computed_later_is_refused(self):
+        """The refusal says so rather than producing a number from nothing."""
+        _units, problems = self._build(
+            {"id": "early", "op": "ratio", "numerator": "late", "denominator": "late"},
+            {"id": "late", "source": "products.csv", "op": "count"},
+        )
+        self.assertEqual([problem["id"] for problem in problems], ["early"])
+        self.assertIn("computed earlier in this call", problems[0]["error"])
+
+    def test_a_comparison_op_is_refused_as_a_grouped_measure(self):
+        """It compares two computed figures, so it cannot be a per-row measure.
+
+        Left in SUPPORTED_OPS it would have fallen through to the final branch
+        of the value switch and been silently computed as top_share.
+        """
+        _units, problems = build_requested_units(
+            [{"id": "as_measure", "source": "products.csv",
+              "group_by": {"column": "category"},
+              "measures": [{"op": "ratio"}]}],
+            REGISTRY, CREATED_AT,
+        )
+        self.assertEqual([problem["id"] for problem in problems], ["as_measure"])
+        self.assertIn("registered on its own", problems[0]["error"])
+
+    def test_a_wrong_row_name_prints_the_rows_that_exist(self):
+        _units, problems = self._build({
+            "id": "typo", "op": "ratio", "source": "band", "column": "Listings",
+            "numerator_group": "0–49", "denominator_group": "cheap",
+        })
+        self.assertIn("Its rows are: 0–49, 50–99, 100+, All", problems[0]["error"])
+
+
+class DeclaredPrecisionTests(unittest.TestCase):
+    """The places the author needs, made true of the evidence.
+
+    FE refuses a claim carrying more decimal places than its evidence — four of
+    the 67 recorded blocks are exactly that. Declaring the places rounds the
+    figure before it is recorded, which repairs the mismatch without loosening
+    the comparison.
+    """
+
+    def test_the_recorded_figure_states_the_places_that_were_asked_for(self):
+        units, problems = build_requested_units(
+            [{"id": "mean_price", "source": "products.csv", "op": "mean",
+              "column": "price", "decimals": 1}],
+            REGISTRY, CREATED_AT,
+        )
+        self.assertEqual(problems, [])
+        unit = _only(units, "E_D_mean_price")
+        self.assertIn("67.0 USD", unit["content"])
+        self.assertEqual(unit["derivation"]["decimals"], 1)
+
+    def test_expect_is_compared_against_the_rounded_figure(self):
+        _units, problems = build_requested_units(
+            [{"id": "rounded", "source": "products.csv", "op": "mean",
+              "column": "price", "decimals": 0, "expect": 67}],
+            REGISTRY, CREATED_AT,
+        )
+        self.assertEqual(problems, [])
+
+    def test_a_places_count_outside_the_range_is_refused_by_name(self):
+        _units, problems = build_requested_units(
+            [{"id": "silly", "source": "products.csv", "op": "mean",
+              "column": "price", "decimals": 12}],
+            REGISTRY, CREATED_AT,
+        )
+        self.assertIn("between 0 and 6", problems[0]["error"])
+
+
+class JoinableKeysAreReportedTests(unittest.TestCase):
+    """Which files connect, computed instead of left to be noticed.
+
+    A recorded run wrote that two of its files shared no column, to explain why
+    it skipped the cross tabulation. Both key on `asin`.
+    """
+
+    def test_a_shared_key_is_found_with_the_size_of_the_join(self):
+        from report_workflow.derived_evidence import joinable_key_report
+
+        findings = joinable_key_report(REGISTRY)
+        self.assertEqual(len(findings), 1)
+        finding = findings[0]
+        self.assertEqual(finding["column"], "asin")
+        self.assertEqual({finding["left_file"], finding["right_file"]},
+                         {"products.csv", "reviews.csv"})
+        # A1 twice on the right, A5 once; R4 names a listing that is not there.
+        self.assertEqual(finding["joined_rows"], 3)
+        self.assertEqual(finding["shared_values"], 2)
+
+    def test_two_unrelated_id_columns_are_not_reported_as_a_key(self):
+        """Same name, disjoint values: two exports that both number their rows."""
+        from report_workflow.derived_evidence import joinable_key_report
+
+        left = _source("a", "left.csv", [{"id": str(n)} for n in range(1, 6)])
+        right = _source("b", "right.csv", [{"id": str(n)} for n in range(90, 95)])
+        self.assertEqual(joinable_key_report([left, right]), [])
+
+    def test_a_low_cardinality_column_shared_by_both_is_not_a_key(self):
+        """Joining two categories multiplies rows rather than connecting them."""
+        from report_workflow.derived_evidence import joinable_key_report
+
+        left = _source("a", "left.csv", [{"kind": k} for k in "aabbaabb"])
+        right = _source("b", "right.csv", [{"kind": k} for k in "abababab"])
+        self.assertEqual(joinable_key_report([left, right]), [])
+
+
+if __name__ == "__main__":
+    unittest.main()

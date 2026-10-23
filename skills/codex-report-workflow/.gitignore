@@ -1,0 +1,58 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Package distributions
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+
+# Type checking & test caches
+.mypy_cache/
+.pytest_cache/
+
+# Workflow run data (generated at runtime)
+output/
+out/
+.runs/
+custom-out/
+# ...except the sample deliverable, which is committed on purpose: `output/`
+# matches at any depth, so examples/output/ was silently dropped from its own
+# commit while the contract test still passed against the working copy.
+!examples/output/
+benchmarks/evidence/*/partial/
+# External datasets fetched on demand (see scripts/run_external_benchmark.py)
+benchmarks/external_data/
+reports/
+tmp/
+workflow_output*/
+
+# Temporary repair scripts
+temp_*.py
+fix_*.py
+strip_figures*.py
+check_sentence_map.py
+create_artifacts.py
+run_start.py
+submit_all.py
+
+# Tool metadata (not part of the skill)
+.omx/
+.sisyphus/
+graphify-out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment secrets (never commit!)
+.env
+.env.*
+!.env.example

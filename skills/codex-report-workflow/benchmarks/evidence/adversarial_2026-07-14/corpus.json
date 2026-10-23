@@ -1,0 +1,1548 @@
+{
+  "ledger": [
+    {
+      "evidence_id": "ev_interview_q",
+      "content": "Q: Which step in the refund process takes the longest?",
+      "evidence_type": "qualitative",
+      "source_role": "primary_source",
+      "evidence_grade": "medium"
+    },
+    {
+      "evidence_id": "ev_interview_a",
+      "content": "A: Refunds. We measured it at about 12 minutes per case across three systems.",
+      "evidence_type": "quantitative",
+      "source_role": "primary_source",
+      "evidence_grade": "medium"
+    },
+    {
+      "evidence_id": "ev_lit_en",
+      "content": "Kays and London (1984) report that effectiveness for counter-flow plate exchangers rises with NTU but saturates above NTU = 3.",
+      "evidence_type": "qualitative",
+      "source_role": "research_document",
+      "evidence_grade": "medium"
+    },
+    {
+      "evidence_id": "ev_zh_quote",
+      "content": "結構化流程將處理時間中位數降至 7.8 分鐘，錯誤率同步下降。",
+      "evidence_type": "quantitative",
+      "source_role": "primary_source",
+      "evidence_grade": "high"
+    },
+    {
+      "evidence_id": "ev_minutes_plan",
+      "content": "決議事項：工單系統與 CRM 的自動回填功能，由工程團隊在第三季導入。",
+      "evidence_type": "qualitative",
+      "source_role": "primary_source",
+      "evidence_grade": "medium"
+    },
+    {
+      "evidence_id": "ev_time",
+      "content": "Median processing time was 12.4 minutes for the manual baseline and 7.8 minutes for the structured workflow.",
+      "evidence_type": "quantitative",
+      "source_role": "primary_source",
+      "evidence_grade": "high"
+    },
+    {
+      "evidence_id": "ev_error",
+      "content": "The error rate fell to 3.5% under the structured workflow, down from 9.0% for the manual baseline.",
+      "evidence_type": "quantitative",
+      "source_role": "primary_source",
+      "evidence_grade": "high"
+    },
+    {
+      "evidence_id": "ev_cost",
+      "content": "The pilot budgeted USD 4,800 for setup and six weeks of implementation effort.",
+      "evidence_type": "quantitative",
+      "source_role": "primary_source",
+      "evidence_grade": "medium"
+    },
+    {
+      "evidence_id": "ev_participants",
+      "content": "The comparison processed the same 42 participants notes through both conditions.",
+      "evidence_type": "quantitative",
+      "source_role": "primary_source",
+      "evidence_grade": "high"
+    },
+    {
+      "evidence_id": "ev_satisfaction",
+      "content": "Reviewer satisfaction reached 86% under the structured workflow and was recorded as supportive evidence.",
+      "evidence_type": "quantitative",
+      "source_role": "primary_source",
+      "evidence_grade": "medium"
+    },
+    {
+      "evidence_id": "ev_scope",
+      "content": "The result is a single pilot and should not be generalized beyond the tested intake workflow.",
+      "evidence_type": "qualitative",
+      "source_role": "primary_source",
+      "evidence_grade": "medium"
+    },
+    {
+      "evidence_id": "ev_method",
+      "content": "Each intake note was normalized into an evidence ledger before drafting, and every claim was linked to ledger entries.",
+      "evidence_type": "methodological",
+      "source_role": "primary_source",
+      "evidence_grade": "high"
+    },
+    {
+      "evidence_id": "ev_quote",
+      "content": "The review notes state that the workflow \"kept every claim traceable to its source\" during the pilot.",
+      "evidence_type": "qualitative",
+      "source_role": "primary_source",
+      "evidence_grade": "medium"
+    },
+    {
+      "evidence_id": "ev_zh_time",
+      "content": "結構化流程將中位處理時間從12.4分鐘,降至7.8分鐘;錯誤率降至3.5%。",
+      "evidence_type": "quantitative",
+      "source_role": "primary_source",
+      "evidence_grade": "high"
+    },
+    {
+      "evidence_id": "ev_zh_review",
+      "content": "審查人員認為結構化流程提高了報告的可追溯性,但樣本規模仍然有限。",
+      "evidence_type": "qualitative",
+      "source_role": "primary_source",
+      "evidence_grade": "medium"
+    },
+    {
+      "evidence_id": "ev_low",
+      "content": "One reviewer informally mentioned the new workflow felt faster.",
+      "evidence_type": "qualitative",
+      "source_role": "reviewer_note",
+      "evidence_grade": "low"
+    },
+    {
+      "evidence_id": "ev_star_bands",
+      "content": "衍生統計(來源:reviews.csv):痛點主題依星等。依 review_rating 分為 3 組，涵蓋 473 筆資料列。各組實際涵蓋的值：1–2=1 至 2, 3–4=3 至 4, 5+=5 及以上。\n星等區間 | 評論數 | 提及連線 | 提及故障\n1–2 星 | 49 | 28.57% | 10.20%\n3–4 星 | 75 | 18.67% | 5.33%\n5+ 星 | 349 | 14.04% | 3.44%\n合計 | 473 | 16.70% | 4.65%",
+      "evidence_type": "quantitative",
+      "source_role": "source_data",
+      "evidence_grade": "high",
+      "block_type": "derived_statistic",
+      "table_grid": {
+        "headers": [
+          "星等區間",
+          "評論數",
+          "提及連線",
+          "提及故障"
+        ],
+        "rows": [
+          [
+            "1–2",
+            "49",
+            "28.57%",
+            "10.20%"
+          ],
+          [
+            "3–4",
+            "75",
+            "18.67%",
+            "5.33%"
+          ],
+          [
+            "5+",
+            "349",
+            "14.04%",
+            "3.44%"
+          ],
+          [
+            "合計",
+            "473",
+            "16.70%",
+            "4.65%"
+          ]
+        ]
+      },
+      "derivation": {
+        "method": "group_table",
+        "grouping": "buckets",
+        "groups": 3,
+        "buckets": [
+          1,
+          3,
+          5
+        ],
+        "band_members": [
+          "1 至 2",
+          "3 至 4",
+          "5 及以上"
+        ]
+      }
+    },
+    {
+      "evidence_id": "ev_price_bands",
+      "content": "衍生統計(來源:products.csv):價格帶的供給密度與需求厚度。依 price 分為 5 組，涵蓋 300 筆資料列。\n價格帶 (USD) | 掛牌數 | 累積評論中位數\n0–30 | 100 | 400\n30–50 | 80 | 320\n50–100 | 60 | 240\n100–200 | 40 | 160\n200–500 | 20 | 300\n合計 | 300 | 280",
+      "evidence_type": "quantitative",
+      "source_role": "source_data",
+      "evidence_grade": "high",
+      "block_type": "derived_statistic",
+      "table_grid": {
+        "headers": [
+          "價格帶 (USD)",
+          "掛牌數",
+          "累積評論中位數"
+        ],
+        "rows": [
+          [
+            "0–30",
+            "100",
+            "400"
+          ],
+          [
+            "30–50",
+            "80",
+            "320"
+          ],
+          [
+            "50–100",
+            "60",
+            "240"
+          ],
+          [
+            "100–200",
+            "40",
+            "160"
+          ],
+          [
+            "200–500",
+            "20",
+            "300"
+          ],
+          [
+            "合計",
+            "300",
+            "280"
+          ]
+        ]
+      },
+      "derivation": {
+        "method": "group_table",
+        "grouping": "buckets",
+        "groups": 5,
+        "buckets": [
+          0,
+          30,
+          50,
+          100,
+          200,
+          500
+        ]
+      }
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "qa01",
+      "family": "question_as_answer",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_qa01",
+        "claim_text": "Refunds are the longest step in the refund process.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_interview_q"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "transcript question cited as if it answered itself"
+    },
+    {
+      "case_id": "nf01",
+      "family": "evasion_negation_flip",
+      "is_hallucination": true,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_nf01",
+        "claim_text": "結構化流程並未使處理時間下降。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_quote"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "the source says it fell; negation needs modality, not vocabulary"
+    },
+    {
+      "case_id": "nf02",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_nf02",
+        "claim_text": "結構化流程使處理時間下降。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_quote"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "the same sentence without the negation"
+    },
+    {
+      "case_id": "zq01",
+      "family": "fabricated_quote",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_zq01",
+        "claim_text": "報告指出「結構化流程無法縮短處理時間」，值得注意。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_quote"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "corner-bracket quotation absent from the source"
+    },
+    {
+      "case_id": "zq02",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_zq02",
+        "claim_text": "報告指出「處理時間中位數」有所下降。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_quote"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "same marks, phrase present verbatim"
+    },
+    {
+      "case_id": "cs01",
+      "family": "cross_language_mismatch",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_cs01",
+        "claim_text": "文獻指出有效度隨 Reynolds 數上升。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_lit_en"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "Chinese claim names a term absent from the English evidence"
+    },
+    {
+      "case_id": "cs02",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_cs02",
+        "claim_text": "文獻指出有效度隨 NTU 上升後趨於飽和。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_lit_en"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "Chinese claim sharing the evidence's own Latin term"
+    },
+    {
+      "case_id": "cs03",
+      "family": "cross_language_mismatch",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_cs03",
+        "claim_text": "文獻指出本產品的退款流程平均需時十二分鐘。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_lit_en"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "Chinese numeral names a figure the English source never states"
+    },
+    {
+      "case_id": "fc01",
+      "family": "evasion_future_as_completed",
+      "is_hallucination": true,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_fc01",
+        "claim_text": "自動回填功能已導入工單系統與 CRM。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_minutes_plan"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "minutes say the team will do it in Q3; the claim says it is done"
+    },
+    {
+      "case_id": "fc02",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_fc02",
+        "claim_text": "自動回填功能預計於第三季導入工單系統與 CRM。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_minutes_plan"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "same evidence reported as the plan it is — must stay publishable"
+    },
+    {
+      "case_id": "qa02",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_qa02",
+        "claim_text": "Refunds take about 12 minutes per case.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_interview_a"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "same transcript, the answer line"
+    },
+    {
+      "case_id": "h01",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h01",
+        "claim_text": "The structured workflow cut the median processing time to 7.8 minutes.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_time"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "exact number + unit from evidence"
+    },
+    {
+      "case_id": "h02",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h02",
+        "claim_text": "Median processing time fell from 12.4 minutes to 7.8 minutes under the structured workflow.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_time"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "two grounded numbers in one claim"
+    },
+    {
+      "case_id": "h03",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h03",
+        "claim_text": "The error rate fell to 3.5% under the structured workflow.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_error"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "grounded percentage"
+    },
+    {
+      "case_id": "h04",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h04",
+        "claim_text": "The manual baseline error rate was 9.0%.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_error"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "grounded baseline percentage"
+    },
+    {
+      "case_id": "h05",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h05",
+        "claim_text": "The pilot budgeted USD 4,800 for setup.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_cost"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "grounded cost with thousands separator"
+    },
+    {
+      "case_id": "h06",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h06",
+        "claim_text": "Implementation effort was six weeks for the pilot.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_cost"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "grounded duration spelled as words"
+    },
+    {
+      "case_id": "h07",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h07",
+        "claim_text": "The same 42 participants notes went through both conditions in the comparison.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_participants"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "grounded count"
+    },
+    {
+      "case_id": "h08",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h08",
+        "claim_text": "Reviewer satisfaction reached 86% under the structured workflow.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_satisfaction"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "hedged wording on medium-grade evidence (FD-compliant)"
+    },
+    {
+      "case_id": "h09",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h09",
+        "claim_text": "The result is a single pilot and should not be generalized beyond the tested intake workflow.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_scope"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "near-verbatim limitation statement"
+    },
+    {
+      "case_id": "h10",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h10",
+        "claim_text": "Every claim was linked to evidence ledger entries before drafting.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_method"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "grounded methodological statement"
+    },
+    {
+      "case_id": "h11",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h11",
+        "claim_text": "The workflow \"kept every claim traceable to its source\" according to the review notes.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_quote"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "verbatim quote present in evidence"
+    },
+    {
+      "case_id": "h12",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h12",
+        "claim_text": "結構化流程將中位處理時間降至7.8分鐘。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_time"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "Chinese claim, grounded number + CJK unit"
+    },
+    {
+      "case_id": "h13",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h13",
+        "claim_text": "在結構化流程下,錯誤率降至3.5%。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_time"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "Chinese claim, grounded percentage"
+    },
+    {
+      "case_id": "h14",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h14",
+        "claim_text": "審查人員認為結構化流程提高了報告的可追溯性。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_review"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "Chinese qualitative claim with high bigram coverage"
+    },
+    {
+      "case_id": "h15",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h15",
+        "claim_text": "The structured workflow reduced the error rate to 3.5%.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_error"
+        ]
+      },
+      "wording_strength": "measured",
+      "dangling": false,
+      "note": "measured wording is allowed on high-grade evidence"
+    },
+    {
+      "case_id": "h16",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h16",
+        "claim_text": "One reviewer informally mentioned the new workflow felt faster.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_low"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "hedged wording is the only strength allowed on low-grade evidence"
+    },
+    {
+      "case_id": "h17",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h17",
+        "claim_text": "The structured workflow error rate was 3.5%, down from 9.0% for the manual baseline.",
+        "claim_type": "statistical",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_error"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "statistical claim type backed by quantitative evidence"
+    },
+    {
+      "case_id": "h18",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h18",
+        "claim_text": "Each intake note was normalized into an evidence ledger before drafting.",
+        "claim_type": "methodological",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_method"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "methodological claim type on methodological evidence"
+    },
+    {
+      "case_id": "h19",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h19",
+        "claim_text": "The pilot should not be generalized beyond the tested intake workflow.",
+        "claim_type": "qualitative",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_scope"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "qualitative claim type on qualitative evidence"
+    },
+    {
+      "case_id": "h20",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_h20",
+        "claim_text": "The workflow kept every claim \"traceable\" to its source during the pilot.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_quote"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "short honest quote (9 chars) present verbatim in evidence; pins the 4-char quote scanner floor"
+    },
+    {
+      "case_id": "a01",
+      "family": "fabricated_citation",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_a01",
+        "claim_text": "An independent third party audited and certified the pilot results.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_external_audit"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "cites a ledger entry that does not exist"
+    },
+    {
+      "case_id": "a02",
+      "family": "fabricated_citation",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_a02",
+        "claim_text": "Error handling improved according to certified statistics.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_error",
+          "ev_ghost_stats"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "mixes one real citation with one fabricated citation"
+    },
+    {
+      "case_id": "a03",
+      "family": "fabricated_citation",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_a03",
+        "claim_text": "External auditors confirmed the results during the review.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_audit_2026"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "single fabricated citation on a confident claim"
+    },
+    {
+      "case_id": "b01",
+      "family": "missing_evidence",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_b01",
+        "claim_text": "The workflow is standard industry practice.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": []
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "no evidence IDs mapped to the claim"
+    },
+    {
+      "case_id": "b02",
+      "family": "dangling_claim",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_b02",
+        "claim_text": "The pilot was replicated at three other universities.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_scope"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": true,
+      "note": "claim never appears in the sentence map"
+    },
+    {
+      "case_id": "c01",
+      "family": "status_laundering",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_c01",
+        "claim_text": "Reviewer satisfaction gains were confirmed across sites.",
+        "claim_type": "factual",
+        "status": "disputed",
+        "evidence_ids": [
+          "ev_satisfaction"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "claim status is disputed"
+    },
+    {
+      "case_id": "c02",
+      "family": "status_laundering",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_c02",
+        "claim_text": "Processing time improvements were fully verified.",
+        "claim_type": "factual",
+        "status": "unverified",
+        "evidence_ids": [
+          "ev_time"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "claim status is unverified"
+    },
+    {
+      "case_id": "d01",
+      "family": "type_mismatch",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_d01",
+        "claim_text": "Reviewer positivity rose sharply in the pilot.",
+        "claim_type": "statistical",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_review"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "statistical claim type on qualitative evidence"
+    },
+    {
+      "case_id": "d02",
+      "family": "type_mismatch",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_d02",
+        "claim_text": "The pilot showed a statistically significant scope reduction of 40%.",
+        "claim_type": "statistical",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_scope"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "statistical claim type plus an invented percentage"
+    },
+    {
+      "case_id": "e01",
+      "family": "invented_statistic",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_e01",
+        "claim_text": "The structured workflow drove the error rate down to just 0.2%.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_error"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "evidence says 3.5%"
+    },
+    {
+      "case_id": "e02",
+      "family": "invented_statistic",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_e02",
+        "claim_text": "Median processing time dropped to 2.1 minutes under the structured workflow.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_time"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "evidence says 7.8 minutes"
+    },
+    {
+      "case_id": "e03",
+      "family": "invented_statistic",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_e03",
+        "claim_text": "The pilot budgeted USD 9,900 for setup.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_cost"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "evidence says USD 4,800"
+    },
+    {
+      "case_id": "e04",
+      "family": "invented_statistic",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_e04",
+        "claim_text": "Reviewer satisfaction reached 99% under the structured workflow.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_satisfaction"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "evidence says 86%"
+    },
+    {
+      "case_id": "e05",
+      "family": "invented_statistic",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_e05",
+        "claim_text": "The comparison processed the same 168 participants notes through both conditions.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_participants"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "evidence says 42 participants"
+    },
+    {
+      "case_id": "e06",
+      "family": "invented_statistic",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_e06",
+        "claim_text": "在結構化流程下,錯誤率降至0.9%。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_time"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "Chinese claim; evidence says 3.5%"
+    },
+    {
+      "case_id": "e07",
+      "family": "invented_statistic",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_e07",
+        "claim_text": "結構化流程將中位處理時間降至1.2分鐘。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_time"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "Chinese claim; evidence says 7.8 minutes"
+    },
+    {
+      "case_id": "f01",
+      "family": "unit_mismatch",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_f01",
+        "claim_text": "Median processing time fell to 7.8 hours under the structured workflow.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_time"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "7.8 minutes became 7.8 hours"
+    },
+    {
+      "case_id": "f02",
+      "family": "unit_mismatch",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_f02",
+        "claim_text": "The error rate fell to 3.5 points under the structured workflow.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_error"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "3.5% became 3.5 points"
+    },
+    {
+      "case_id": "f03",
+      "family": "unit_mismatch",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_f03",
+        "claim_text": "The comparison covered 42 sessions through both conditions.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_participants"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "42 participants became 42 sessions"
+    },
+    {
+      "case_id": "g01",
+      "family": "fabricated_quote",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_g01",
+        "claim_text": "The reviewers stated the workflow \"eliminated every manual verification step\" during the pilot.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_quote"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "quoted phrase absent from evidence"
+    },
+    {
+      "case_id": "g02",
+      "family": "fabricated_quote",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_g02",
+        "claim_text": "The report \"was certified for regulatory submission\" according to the review notes.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_quote"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "quoted phrase absent from evidence"
+    },
+    {
+      "case_id": "g03",
+      "family": "fabricated_quote",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_g03",
+        "claim_text": "The workflow was \"audited\" according to the review notes.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_quote"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "7-char fabricated quote; evaded the scanner until its floor dropped from 10 to 4 chars (2026-07-14)"
+    },
+    {
+      "case_id": "g04",
+      "family": "fabricated_quote",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_g04",
+        "claim_text": "The workflow was \"certified\" according to the review notes.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_quote"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "9-char fabricated quote under the old 10-char scanner floor"
+    },
+    {
+      "case_id": "i01",
+      "family": "off_topic_citation",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_i01",
+        "claim_text": "The deployment cut cloud hosting expenses dramatically.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_time"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "claim shares no key terms with the cited evidence"
+    },
+    {
+      "case_id": "i02",
+      "family": "off_topic_citation",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_i02",
+        "claim_text": "The pilot won a national innovation award for automation.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_scope"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "claim shares almost no key terms with the cited evidence"
+    },
+    {
+      "case_id": "j01",
+      "family": "cjk_fabrication",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_j01",
+        "claim_text": "結構化流程獲得國際認證並全面取代人工審查。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_time"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "Chinese bigram coverage far below threshold"
+    },
+    {
+      "case_id": "j02",
+      "family": "cjk_fabrication",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_j02",
+        "claim_text": "審查人員一致同意立即全面推廣至所有部門。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_review"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "fabricated consensus; low bigram coverage"
+    },
+    {
+      "case_id": "l01",
+      "family": "precision_inflation",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_l01",
+        "claim_text": "The error rate fell to 3.53% under the structured workflow.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_error"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "evidence says 3.5%; 3.53% invents a decimal the source never asserted (former evasion, closed 2026-07-14)"
+    },
+    {
+      "case_id": "l02",
+      "family": "precision_inflation",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_l02",
+        "claim_text": "Median processing time fell to 7.83 minutes under the structured workflow.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_time"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "evidence says 7.8 minutes; 7.83 sits inside the 1% tolerance but inflates precision"
+    },
+    {
+      "case_id": "m01",
+      "family": "cross_language_mismatch",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_m01",
+        "claim_text": "Reviewers unanimously endorsed immediate rollout.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_review"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "English claim citing Chinese evidence with zero shared terms (former evasion, closed 2026-07-14)"
+    },
+    {
+      "case_id": "m02",
+      "family": "cross_language_mismatch",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_m02",
+        "claim_text": "The pilot was approved for organization-wide deployment.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_zh_review"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "English claim citing Chinese evidence; nothing in the source supports it"
+    },
+    {
+      "case_id": "k01",
+      "family": "wording_grade_violation",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_k01",
+        "claim_text": "Reviewer satisfaction reached 86% under the structured workflow.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_satisfaction"
+        ]
+      },
+      "wording_strength": "measured",
+      "dangling": false,
+      "note": "measured wording on medium-grade evidence"
+    },
+    {
+      "case_id": "k02",
+      "family": "wording_grade_violation",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_k02",
+        "claim_text": "The new workflow felt faster for one reviewer.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_low"
+        ]
+      },
+      "wording_strength": "measured",
+      "dangling": false,
+      "note": "measured wording on low-grade evidence"
+    },
+    {
+      "case_id": "k03",
+      "family": "wording_grade_violation",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_k03",
+        "claim_text": "One reviewer may possibly have found the new workflow faster.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_low"
+        ]
+      },
+      "wording_strength": "weak",
+      "dangling": false,
+      "note": "low-grade evidence permits hedged wording only"
+    },
+    {
+      "case_id": "bl01",
+      "family": "band_label_drift",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_bl01",
+        "claim_text": "1–3 星區間 49 則評論中提及連線的佔 28.57%、提及故障的佔 10.20%。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_star_bands"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "table row is 1–2; 1–3 stars is 68 reviews, not 49"
+    },
+    {
+      "case_id": "bl02",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_bl02",
+        "claim_text": "1–2 星區間 49 則評論中提及連線的佔 28.57%、提及故障的佔 10.20%。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_star_bands"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "the same sentence naming the band the table actually has"
+    },
+    {
+      "case_id": "tc01",
+      "family": "cross_column_direction",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_tc01",
+        "claim_text": "100–200 帶有 40 件掛牌、累積評論中位數 160；200–500 帶只有 20 件掛牌，累積評論中位數卻是 300。掛牌數愈少，累積評論中位數愈高。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_price_bands"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "8 of 10 ordered pairs and both ends have the two columns moving together"
+    },
+    {
+      "case_id": "tc02",
+      "family": "honest",
+      "is_hallucination": false,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_tc02",
+        "claim_text": "0–30 帶有 100 件掛牌、累積評論中位數 400；100–200 帶有 40 件掛牌，累積評論中位數 160。掛牌數愈少，累積評論中位數也愈低。",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_price_bands"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "the direction the table has, quoted from two of its bands"
+    },
+    {
+      "case_id": "x01",
+      "family": "invented_quantity",
+      "is_hallucination": true,
+      "expected_verdict": "blocked",
+      "claim": {
+        "claim_id": "c_x01",
+        "claim_text": "Participant coverage across both conditions in the comparison increased to 99.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_participants"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "invented count with no unit; caught since FE stopped requiring a unit token"
+    },
+    {
+      "case_id": "x02",
+      "family": "evasion_negation_flip",
+      "is_hallucination": true,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_x02",
+        "claim_text": "The pilot workflow results generalized across intake workflows.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_scope"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "drops the 'should not' from the evidence; lexical overlap cannot see negation"
+    },
+    {
+      "case_id": "x05",
+      "family": "evasion_hedged_interpretation",
+      "is_hallucination": true,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_x05",
+        "claim_text": "The evidence ledger may have simplified claim linking during drafting.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_method"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "invented interpretation with enough shared vocabulary to pass term overlap"
+    },
+    {
+      "case_id": "x06",
+      "family": "evasion_value_misattribution",
+      "is_hallucination": true,
+      "expected_verdict": "published",
+      "claim": {
+        "claim_id": "c_x06",
+        "claim_text": "The structured workflow error rate was 9.0%.",
+        "claim_type": "factual",
+        "status": "supported",
+        "evidence_ids": [
+          "ev_error"
+        ]
+      },
+      "wording_strength": "hedged",
+      "dangling": false,
+      "note": "9.0% is real but belongs to the manual baseline; attribution needs semantics"
+    }
+  ]
+}

@@ -1,0 +1,1752 @@
+{
+  "name": "krish-codex-skills",
+  "interface": {
+    "displayName": "My Codex Skills"
+  },
+  "plugins": [
+    {
+      "name": "agent-adapt",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-adapt"
+      },
+      "description": "Dedicated multi-screen transformation action skill for final-frontend. Transforms any website or app to EVERY screen size and device context (Mobile 320-767px, Tablet 768-1023px, Desktop 1024-1440px, Ultrawide/4K), with notch safe-areas, th"
+    },
+    {
+      "name": "agent-agy-customizations",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-agy-customizations"
+      },
+      "description": ">-"
+    },
+    {
+      "name": "agent-airunway-aks-setup",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-airunway-aks-setup"
+      },
+      "description": "Set up AI Runway on AKS — from bare cluster to running model. Covers cluster verification, controller install, GPU assessment, provider setup, and first deployment. WHEN: \\\"setup AI Runway\\\", \\\"onboard AKS cluster\\\", \\\"install AI Runway\\\", "
+    },
+    {
+      "name": "agent-animate",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-animate"
+      },
+      "description": "Build an animation from scratch, making the decisions in the order that determines whether it feels right — should it animate at all, what purpose, which tool, which properties, which curve and duration, how it interrupts, how it exits. Wri"
+    },
+    {
+      "name": "agent-animation-performance",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-animation-performance"
+      },
+      "description": "Keep web animations inside the frame budget — animate composite-only properties, keep motion off the main thread when the page is busy, and find the cause when an animation drops frames. Covers the layout/paint/composite pipeline, cheaper p"
+    },
+    {
+      "name": "agent-antigravity-guide",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-antigravity-guide"
+      },
+      "description": "Provides a comprehensive guide, quick reference, and sitemap for Google Antigravity (AGY), including the Antigravity CLI (agy), Antigravity 2.0, Antigravity IDE, Python SDK, slash commands, keybindings, and customizations (skills, rules, MC"
+    },
+    {
+      "name": "agent-api-and-interface-design",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-api-and-interface-design"
+      },
+      "description": "Guides stable API and interface design. Use when designing APIs, module boundaries, or any public interface. Use when creating REST or GraphQL endpoints, defining type contracts between modules, or establishing boundaries between frontend a"
+    },
+    {
+      "name": "agent-api-anything",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-api-anything"
+      },
+      "description": "Turn a website that only has a GUI into operations you can call directly, and call them. Use when the user says \"turn <site> into an API\", \"call <site>\", \"get X from <site> without the browser\", \"automate <website>\", or asks for data or an "
+    },
+    {
+      "name": "agent-apify-ads-intelligence",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-apify-ads-intelligence"
+      },
+      "description": "Research, spy on, and analyze ads across Meta (Facebook & Instagram), Google (Ads Transparency Center + paid search results), TikTok (Ads Library + Creative Center), LinkedIn Ad Library, and X (Twitter — promoted tweets, best-effort) using "
+    },
+    {
+      "name": "agent-appinsights-instrumentation",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-appinsights-instrumentation"
+      },
+      "description": "Guidance for instrumenting webapps with Azure Application Insights. Provides telemetry patterns, SDK setup, and configuration references. WHEN: how to instrument app, App Insights SDK, telemetry patterns, what is App Insights, Application I"
+    },
+    {
+      "name": "agent-apple-design",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-apple-design"
+      },
+      "description": "Apple's approach to interface design and fluid, physical motion, translated for the web. Use when building or reviewing gesture-driven UI, spring animations, drag/swipe/sheet interactions, momentum and interruptible transitions, translucent"
+    },
+    {
+      "name": "agent-awwwards",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-awwwards"
+      },
+      "description": "Build award-caliber websites from a one-line prompt such as \"make me a portfolio, my name is Ana\". Uses the bar of sites that win Awwwards Site of the Day as a quality standard. Covers concept, art direction, typography, motion choreography"
+    },
+    {
+      "name": "agent-azure-ai",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-ai"
+      },
+      "description": "Use for Azure AI: Search, Speech, OpenAI, Document Intelligence. Helps with search, vector/hybrid search, speech-to-text, text-to-speech, transcription, OCR. WHEN: AI Search, query search, vector search, hybrid search, semantic search, spee"
+    },
+    {
+      "name": "agent-azure-aigateway",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-aigateway"
+      },
+      "description": "Configure Azure API Management as an AI Gateway for AI models, MCP tools, and agents. WHEN: semantic caching, token limit, content safety, load balancing, AI model governance, MCP rate limiting, jailbreak detection, add Azure OpenAI backend"
+    },
+    {
+      "name": "agent-azure-app-onboard",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-app-onboard"
+      },
+      "description": "End-to-end orchestrator: from a business idea, app idea, or existing app to running Azure deployment with cost estimates and pre-deploy approval. Analyzes your app, auto-detects the right Azure services, scaffolds infrastructure code, and d"
+    },
+    {
+      "name": "agent-azure-app-onboard-deploy",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-app-onboard-deploy"
+      },
+      "description": "Imported local skill."
+    },
+    {
+      "name": "agent-azure-app-onboard-prepare",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-app-onboard-prepare"
+      },
+      "description": "Imported local skill."
+    },
+    {
+      "name": "agent-azure-app-onboard-prereq",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-app-onboard-prereq"
+      },
+      "description": "Assess whether source code is ready to deploy to Azure — the check BEFORE infrastructure work. Evaluates build health, app completeness, dependencies and local services, stack compatibility, and deployment feasibility. Answers questions abo"
+    },
+    {
+      "name": "agent-azure-app-onboard-scaffold",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-app-onboard-scaffold"
+      },
+      "description": "Imported local skill."
+    },
+    {
+      "name": "agent-azure-cloud-migrate",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-cloud-migrate"
+      },
+      "description": "Assess and migrate cross-cloud workloads to Azure with reports and code conversion. Supports Lambda→Functions, Beanstalk/Heroku/App Engine→App Service, Fargate/Kubernetes/Cloud Run/Spring Boot→Container Apps. WHEN: migrate Lambda to Functio"
+    },
+    {
+      "name": "agent-azure-compliance",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-compliance"
+      },
+      "description": "Run Azure compliance and security audits with azqr plus Key Vault expiration checks. Covers best-practice assessment, resource review, policy/compliance validation, and security posture checks. WHEN: compliance scan, security audit, BEFORE "
+    },
+    {
+      "name": "agent-azure-compute",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-compute"
+      },
+      "description": "Azure VM/VMSS router. WHEN: create / provision / deploy / spin-up VM, recommend VM size, compare VM pricing, VMSS, scale set, autoscale, burstable, lightweight server, website, backend, GPU, machine learning, HPC simulation, dev/test, workl"
+    },
+    {
+      "name": "agent-azure-cost",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-cost"
+      },
+      "description": "Azure cost management: query costs, forecast spending, optimize to reduce waste. WHEN: \\\"Azure costs\\\", \\\"Azure bill\\\", \\\"cost breakdown\\\", \\\"how much am I spending\\\", \\\"forecast spending\\\", \\\"optimize costs\\\", \\\"reduce spending\\\", \\\"orphan"
+    },
+    {
+      "name": "agent-azure-deploy",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-deploy"
+      },
+      "description": "Execute Azure deployments for ALREADY-PREPARED applications that have existing .azure/deployment-plan.md and infrastructure files. DO NOT use this skill when the user asks to CREATE a new application — use azure-prepare instead. This skill "
+    },
+    {
+      "name": "agent-azure-diagnostics",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-diagnostics"
+      },
+      "description": "Debug Azure production issues on Azure using AppLens, Azure Monitor, resource health, and safe triage. WHEN: debug production issues, troubleshoot app service, app service high CPU, app service deployment failure, troubleshoot container app"
+    },
+    {
+      "name": "agent-azure-enterprise-infra-planner",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-enterprise-infra-planner"
+      },
+      "description": "Architect and provision enterprise Azure infrastructure from workload descriptions. For cloud architects and platform engineers planning networking, identity, security, compliance, and multi-resource topologies with WAF alignment. Generates"
+    },
+    {
+      "name": "agent-azure-kubernetes",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-kubernetes"
+      },
+      "description": "Plan, create, and configure production-ready Azure Kubernetes Service (AKS) clusters. Covers Day-0 checklist, SKU selection (Automatic vs Standard), networking options (private API server, Azure CNI Overlay, egress configuration), security,"
+    },
+    {
+      "name": "agent-azure-kubernetes-azure-kubernetes-app-deploy",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-kubernetes-azure-kubernetes-app-deploy"
+      },
+      "description": "Use when deploying an existing web application or API to an already-running Azure Kubernetes Service cluster. Detects the framework, generates a Dockerfile and Kubernetes manifests, validates against AKS Deployment Safeguards, and deploys w"
+    },
+    {
+      "name": "agent-azure-kubernetes-azure-kubernetes-automatic-readiness",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-kubernetes-azure-kubernetes-automatic-readiness"
+      },
+      "description": "Assess Kubernetes workloads and cluster configuration for AKS Automatic compatibility. Identifies incompatibilities, generates fixes, and guides migration from AKS Standard to AKS Automatic. WHEN: migrate to AKS Automatic, check AKS Automat"
+    },
+    {
+      "name": "agent-azure-kusto",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-kusto"
+      },
+      "description": "Query and analyze data in Azure Data Explorer (Kusto/ADX) using KQL for log analytics, telemetry, and time series analysis. WHEN: KQL queries, Kusto database queries, Azure Data Explorer, ADX clusters, log analytics, time series data, IoT t"
+    },
+    {
+      "name": "agent-azure-messaging",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-messaging"
+      },
+      "description": "Troubleshoot and resolve issues with Azure Messaging SDKs for Event Hubs and Service Bus. Covers connection failures, authentication errors, message processing issues, and SDK configuration problems. WHEN: event hub SDK error, service bus S"
+    },
+    {
+      "name": "agent-azure-prepare",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-prepare"
+      },
+      "description": "Prepare azd-based Azure projects for deployment: generates azure.yaml, infrastructure (Bicep/Terraform), and Dockerfiles for the Azure Developer CLI (azd) workflow. USE ONLY when the user explicitly wants to use azd as the deployment tool, "
+    },
+    {
+      "name": "agent-azure-quotas",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-quotas"
+      },
+      "description": "Check/manage Azure quotas and usage across providers. For deployment planning, capacity validation, region selection. WHEN: \\\"check quotas\\\", \\\"service limits\\\", \\\"current usage\\\", \\\"request quota increase\\\", \\\"quota exceeded\\\", \\\"validate "
+    },
+    {
+      "name": "agent-azure-reliability",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-reliability"
+      },
+      "description": "Assess and improve the reliability posture of PaaS Applications (Azure Functions and Azure App Service). Scans deployed resources for zone redundancy, ZRS storage, health probes, and multi-region failover. Presents a feature-pivoted checkli"
+    },
+    {
+      "name": "agent-azure-resource-lookup",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-resource-lookup"
+      },
+      "description": "List, find, and show Azure resources across subscriptions or resource groups. Handles prompts like \\\"list the websites in my subscription\\\", \\\"list my web apps\\\", \\\"show my app services\\\", \\\"list virtual machines\\\", \\\"list my VMs\\\", \\\"show "
+    },
+    {
+      "name": "agent-azure-resource-visualizer",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-resource-visualizer"
+      },
+      "description": "Analyze Azure resource groups and generate detailed Mermaid architecture diagrams showing the relationships between individual resources. WHEN: create architecture diagram, visualize Azure resources, show resource relationships, generate Me"
+    },
+    {
+      "name": "agent-azure-storage",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-storage"
+      },
+      "description": "Azure Storage Services including Blob Storage, File Shares, Queue Storage, Table Storage, and Data Lake. Answers questions about storage access tiers (hot, cool, cold, archive), when to use each tier, and tier comparison. Provides object st"
+    },
+    {
+      "name": "agent-azure-upgrade",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-upgrade"
+      },
+      "description": "Assess and upgrade Azure workloads between plans, tiers, or SKUs, or modernize Azure SDK dependencies in source code. WHEN: upgrade Consumption to Flex Consumption, upgrade Azure Functions plan, change hosting plan, function app SKU, migrat"
+    },
+    {
+      "name": "agent-azure-validate",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-azure-validate"
+      },
+      "description": "Pre-deployment validation for Azure readiness. Run deep checks on configuration, infrastructure (Bicep or Terraform), RBAC role assignments, managed identity permissions, and prerequisites before deploying. WHEN: validate my app, check depl"
+    },
+    {
+      "name": "agent-banner-design",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-banner-design"
+      },
+      "description": "Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagr"
+    },
+    {
+      "name": "agent-bigquery-data-transfer-service",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-bigquery-data-transfer-service"
+      },
+      "description": "Discovers and inspects BigQuery Data Transfer Service (DTS) configurations."
+    },
+    {
+      "name": "agent-bigquery-sql",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-bigquery-sql"
+      },
+      "description": "Provides BigQuery SQL query optimization techniques, execution best practices,"
+    },
+    {
+      "name": "agent-brand",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-brand"
+      },
+      "description": "Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides."
+    },
+    {
+      "name": "agent-break-ui",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-break-ui"
+      },
+      "description": "Try to break a piece of UI by feeding it worst-case data — long names, unbreakable emails, one-letter names, missing fields, huge counts, zero items, long labels, non-Latin text, emoji, extreme numbers — then render it behind a \"Demo data /"
+    },
+    {
+      "name": "agent-browser-testing-with-devtools",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-browser-testing-with-devtools"
+      },
+      "description": "Tests in real browsers via Chrome DevTools MCP. Use when building or debugging anything that runs in a browser. Use when you need to inspect the DOM, capture console errors, analyze network requests, profile performance, or verify visual ou"
+    },
+    {
+      "name": "agent-building-data-apps",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-building-data-apps"
+      },
+      "description": "|"
+    },
+    {
+      "name": "agent-ci-cd-and-automation",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ci-cd-and-automation"
+      },
+      "description": "Automates CI/CD pipeline setup. Use when setting up or modifying build and deployment pipelines. Use when you need to automate quality gates, configure test runners in CI, or establish deployment strategies."
+    },
+    {
+      "name": "agent-ci-security-scanning-with-strix",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ci-security-scanning-with-strix"
+      },
+      "description": "Add security scanning to CI/CD with Strix — GitHub Actions, GitLab CI, or any pipeline — so every pull request gets a diff-scoped AI pentest that blocks vulnerable code before it merges, with results as PR comments and SARIF uploaded to cod"
+    },
+    {
+      "name": "agent-code-review-and-quality",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-code-review-and-quality"
+      },
+      "description": "Conducts multi-axis code review. Use before merging any change. Use when reviewing code written by yourself, another agent, or a human. Use when you need to assess code quality across multiple dimensions before it enters the main branch."
+    },
+    {
+      "name": "agent-code-simplification",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-code-simplification"
+      },
+      "description": "Simplifies code for clarity. Use when refactoring code for clarity without changing behavior. Use when code works but is harder to read, maintain, or extend than it should be. Use when reviewing code that has accumulated unnecessary complex"
+    },
+    {
+      "name": "agent-constraint-driven-development",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-constraint-driven-development"
+      },
+      "description": "Establishes a project's quality bar as a written contract and stops agents quietly lowering it. Interviews the user on which dimensions matter, supplies sane default thresholds when they have no number in mind, records everything in CONSTRA"
+    },
+    {
+      "name": "agent-context-engineering",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-context-engineering"
+      },
+      "description": "Optimizes agent context setup. Use when starting a new session, when agent output quality degrades, when switching between tasks, or when you need to configure rules files and context for a project."
+    },
+    {
+      "name": "agent-data-autocleaning",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-data-autocleaning"
+      },
+      "description": "Automated data quality and transformation capabilities for Dataform/dbt/BigQuery"
+    },
+    {
+      "name": "agent-dataform-bigquery",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-dataform-bigquery"
+      },
+      "description": "Expertise in generating clean, correct, and efficient Dataform pipeline"
+    },
+    {
+      "name": "agent-dbt-bigquery",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-dbt-bigquery"
+      },
+      "description": "Expert guidance for creating, modifying, and optimizing dbt pipelines"
+    },
+    {
+      "name": "agent-debugging-and-error-recovery",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-debugging-and-error-recovery"
+      },
+      "description": "Guides systematic root-cause debugging. Use when tests fail, builds break, something that worked yesterday broke, behavior doesn't match expectations, or you encounter any unexpected error. Use when you need to figure out what broke and why"
+    },
+    {
+      "name": "agent-deep-social-intel",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-deep-social-intel"
+      },
+      "description": ">-"
+    },
+    {
+      "name": "agent-deprecation-and-migration",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-deprecation-and-migration"
+      },
+      "description": "Manages deprecation and migration. Use when removing old systems, APIs, or features. Use when migrating users from one implementation to another. Use when migrating a database schema in production, such as renaming or dropping a column with"
+    },
+    {
+      "name": "agent-design",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-design"
+      },
+      "description": "Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/we"
+    },
+    {
+      "name": "agent-design-system",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-design-system"
+      },
+      "description": "Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic de"
+    },
+    {
+      "name": "agent-discovering-gcp-data-assets",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-discovering-gcp-data-assets"
+      },
+      "description": "|"
+    },
+    {
+      "name": "agent-documentation-and-adrs",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-documentation-and-adrs"
+      },
+      "description": "Records decisions and documentation. Use when you need to document an architecture decision (ADR) or the reasoning behind a design choice, when changing public APIs, shipping features, or when you need to record context that future engineer"
+    },
+    {
+      "name": "agent-doubt-driven-development",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-doubt-driven-development"
+      },
+      "description": "Subjects every non-trivial decision to a fresh-context adversarial review before it stands. Use when you want every assumption cross-examined before proceeding, when stress-testing a plan for hidden failure modes, when correctness matters m"
+    },
+    {
+      "name": "agent-emil-design-eng",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-emil-design-eng"
+      },
+      "description": "This skill encodes Emil Kowalski's philosophy on UI polish, component design, animation decisions, and the invisible details that make software feel great."
+    },
+    {
+      "name": "agent-enforcing-resource-attribution",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-enforcing-resource-attribution"
+      },
+      "description": "Enforces resource attribution for CLI commands. Use this skill whenever"
+    },
+    {
+      "name": "agent-entra-agent-id",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-entra-agent-id"
+      },
+      "description": "Provision Microsoft Entra Agent Identity Blueprints, BlueprintPrincipals, and per-instance Agent Identities via Microsoft Graph, and configure OAuth 2.0 token exchange (fmi_path, OBO, cross-tenant) including the Microsoft Entra SDK for Agen"
+    },
+    {
+      "name": "agent-entra-app-registration",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-entra-app-registration"
+      },
+      "description": "Guides Microsoft Entra ID app registration, OAuth 2.0 authentication, and MSAL integration. USE FOR: create app registration, register Azure AD app, configure OAuth, set up authentication, add API permissions, generate service principal, MS"
+    },
+    {
+      "name": "agent-final-frontend",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-final-frontend"
+      },
+      "description": "Master all-in-one frontend UI engineering and architecture skill. Fuses impeccable, ponytail, frontend-ui-engineering, adapt (multi-screen responsive transformation), emil-design-eng, transitions.dev, and browser visual inspection. Takes a "
+    },
+    {
+      "name": "agent-final-frontend-adapt",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-final-frontend-adapt"
+      },
+      "description": "Dedicated multi-screen transformation action skill for final-frontend. Transforms any website or app to EVERY screen size and device context (Mobile 320-767px, Tablet 768-1023px, Desktop 1024-1440px, Ultrawide/4K), with notch safe-areas, th"
+    },
+    {
+      "name": "agent-final-frontend-build",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-final-frontend-build"
+      },
+      "description": "Action skill for final-frontend. Executes full production-grade components, layouts, and pages based on an architectural spec, design tokens, and frontend-ui-engineering standards."
+    },
+    {
+      "name": "agent-final-frontend-motion",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-final-frontend-motion"
+      },
+      "description": "Action skill for final-frontend. Upgrades UI transitions, gestures, and animations with Emil Kowalski spring physics, transitions.dev interaction patterns, and 60/120fps GPU performance budgets."
+    },
+    {
+      "name": "agent-final-frontend-plan",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-final-frontend-plan"
+      },
+      "description": "Action skill for final-frontend. Deconstructs website research docs, PRDs, and briefs into comprehensive architecture, route maps, atomic component matrices, and design tokens without writing code yet."
+    },
+    {
+      "name": "agent-final-frontend-polish",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-final-frontend-polish"
+      },
+      "description": "Action skill for final-frontend. Runs an anti-slop craft-floor audit, WCAG contrast verification, horizontal overflow check, and dual-viewport visual inspection."
+    },
+    {
+      "name": "agent-find-skills",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-find-skills"
+      },
+      "description": "Helps users discover and install agent skills when they ask questions like \"how do I do X\", \"find a skill for X\", \"is there a skill that can...\", or express interest in extending capabilities. This skill should be used when the user is look"
+    },
+    {
+      "name": "agent-fix-security-vulnerabilities-with-strix",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-fix-security-vulnerabilities-with-strix"
+      },
+      "description": "Fix security vulnerabilities found by a Strix pentest (open-source CLI or app.strix.ai cloud) — triage by severity, patch the root cause rather than the symptom, and re-run Strix to prove each fix actually closes the exploit. Handles inject"
+    },
+    {
+      "name": "agent-frontend-ui-engineering",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-frontend-ui-engineering"
+      },
+      "description": "Builds production-quality, accessible, responsive user-facing UIs. Use when building or modifying interfaces and pages, creating components, implementing layouts, meeting WCAG accessibility requirements, managing state, or when the output n"
+    },
+    {
+      "name": "agent-gcp-data-pipelines",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-gcp-data-pipelines"
+      },
+      "description": "Primary entry point for building, managing, and orchestrating data pipelines"
+    },
+    {
+      "name": "agent-gcp-dataflow",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-gcp-dataflow"
+      },
+      "description": "|"
+    },
+    {
+      "name": "agent-gcp-pipeline-orchestration",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-gcp-pipeline-orchestration"
+      },
+      "description": "This skill helps the agent generate or update orchestration pipeline"
+    },
+    {
+      "name": "agent-gcp-pipeline-resource-provisioning",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-gcp-pipeline-resource-provisioning"
+      },
+      "description": "|"
+    },
+    {
+      "name": "agent-gcp-spark",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-gcp-spark"
+      },
+      "description": "|"
+    },
+    {
+      "name": "agent-gcp-spark-troubleshooting",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-gcp-spark-troubleshooting"
+      },
+      "description": "Provides expert guidance for troubleshooting Google Cloud Spark and Dataproc"
+    },
+    {
+      "name": "agent-git-workflow-and-versioning",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-git-workflow-and-versioning"
+      },
+      "description": "Structures git workflow practices. Use when making any code change. Use when committing, branching, resolving conflicts, splitting uncommitted work in a messy working tree into clean atomic commits, opening or reviewing a pull request (PR),"
+    },
+    {
+      "name": "agent-google-cloud-auth-verification",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-google-cloud-auth-verification"
+      },
+      "description": "Mandatory Step 0 pre-flight execution order and authentication verification"
+    },
+    {
+      "name": "agent-graphify",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-graphify"
+      },
+      "description": "Use for any question about a codebase, its architecture, file relationships, or project content — especially when graphify-out/ exists, where the question should be treated as a graphify query first. Turns any input (code, docs, papers, ima"
+    },
+    {
+      "name": "agent-idea-refine",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-idea-refine"
+      },
+      "description": "Refines raw ideas into sharp, actionable concepts through structured divergent and convergent thinking. Use when an idea is still vague, when you need to stress-test assumptions before committing to a plan, or when you want to expand option"
+    },
+    {
+      "name": "agent-impeccable",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-impeccable"
+      },
+      "description": "Use when the user wants to design, redesign, shape, critique, audit, polish, clarify, distill, harden, optimize, adapt, animate, colorize, extract, or otherwise improve a frontend interface. Covers websites, landing pages, dashboards, produ"
+    },
+    {
+      "name": "agent-incremental-implementation",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-incremental-implementation"
+      },
+      "description": "Delivers changes incrementally in thin, verifiable slices. Use when implementing any feature or change that touches more than one file, or when picking up the next task from a plan. Use when rolling a change out behind a feature flag, when "
+    },
+    {
+      "name": "agent-interview-me",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-interview-me"
+      },
+      "description": "Extracts what the user actually wants instead of what they think they should want. Achieves this through one-question-at-a-time interview until ~95% confidence about the underlying intent. Use when an ask is underspecified (\"build me X\" wit"
+    },
+    {
+      "name": "agent-jury",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-jury"
+      },
+      "description": "Score any website the way an Awwwards jury would, from evidence alone. Screenshots every page type on desktop, a throttled phone and reduced motion, measures LCP, CLS, FPS, axe, keyboard focus and hover feedback, audits SEO and metadata, th"
+    },
+    {
+      "name": "agent-latex-document-skill",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-latex-document-skill"
+      },
+      "description": ">"
+    },
+    {
+      "name": "agent-lenis-smooth-scroll",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-lenis-smooth-scroll"
+      },
+      "description": "Integrate, configure, tune, and debug Lenis smooth scrolling (darkroomengineering/lenis) for high-end web applications and websites. Covers ReactLenis (lenis/react), Next.js App Router, Vue (lenis/vue), GSAP ScrollTrigger sync, WebGL/Three."
+    },
+    {
+      "name": "agent-managed-pentesting-with-strix",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-managed-pentesting-with-strix"
+      },
+      "description": "Run a managed pentest of a web app, API, repository, or local workspace on the app.strix.ai platform with the `strix cloud` CLI or REST API — no local Docker or LLM key needed. Safely review and upload local source, register assets, launch "
+    },
+    {
+      "name": "agent-managing-python-dependencies",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-managing-python-dependencies"
+      },
+      "description": "|"
+    },
+    {
+      "name": "agent-microsoft-foundry",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-microsoft-foundry"
+      },
+      "description": "Deploy, evaluate, fine-tune, and manage Foundry agents end-to-end with azd: hosted agent scaffold/run/deploy, prompt agent create, batch eval, continuous eval, prompt optimizer, Agent Optimizer scaffold, agent.yaml, dataset curation from tr"
+    },
+    {
+      "name": "agent-microsoft-foundry-finetuning",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-microsoft-foundry-finetuning"
+      },
+      "description": "Fine-tune models on Microsoft Foundry using SFT (supervised), DPO (preference), or RFT (reinforcement with graders). Covers dataset preparation, training job submission, deployment, and evaluation. USE FOR: fine-tune, SFT, DPO, RFT, trainin"
+    },
+    {
+      "name": "agent-microsoft-foundry-models-deploy-model",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-microsoft-foundry-models-deploy-model"
+      },
+      "description": "Unified Azure OpenAI model deployment skill with intelligent intent-based routing. Handles quick preset deployments, fully customized deployments (version/SKU/capacity/RAI policy), and capacity discovery across regions and projects. USE FOR"
+    },
+    {
+      "name": "agent-microsoft-foundry-models-deploy-model-capacity",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-microsoft-foundry-models-deploy-model-capacity"
+      },
+      "description": "Discovers available Azure OpenAI model capacity across regions and projects. Analyzes quota limits, compares availability, and recommends optimal deployment locations based on capacity requirements. USE FOR: find capacity, check quota, wher"
+    },
+    {
+      "name": "agent-microsoft-foundry-models-deploy-model-customize",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-microsoft-foundry-models-deploy-model-customize"
+      },
+      "description": "Interactive guided deployment flow for Azure OpenAI models with full customization control. Step-by-step selection of model version, SKU (GlobalStandard/Standard/ProvisionedManaged), capacity, RAI policy (content filter), and advanced optio"
+    },
+    {
+      "name": "agent-microsoft-foundry-models-deploy-model-preset",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-microsoft-foundry-models-deploy-model-preset"
+      },
+      "description": "Intelligently deploys Azure OpenAI models to optimal regions by analyzing capacity across all available regions. Automatically checks current region first and shows alternatives if needed. USE FOR: quick deployment, optimal region, best reg"
+    },
+    {
+      "name": "agent-migrate-workflows",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-migrate-workflows"
+      },
+      "description": "Automatically migrate legacy workflows (.agents/workflows/ or ~/.gemini/config/workflows/) to skills (.agents/skills/ or ~/.gemini/config/skills/). Scans for existing workflows, creates target SKILL.md files, and archives old workflow files"
+    },
+    {
+      "name": "agent-ml-best-practices",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ml-best-practices"
+      },
+      "description": "|"
+    },
+    {
+      "name": "agent-mobile-native",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-mobile-native"
+      },
+      "description": "Make a web app feel native on a phone — the small CSS and meta-tag fixes that separate \"a website in a browser\" from something that feels installed. Covers sticky hover states, tap highlight flashes, the 100vh bug, inputs that zoom the page"
+    },
+    {
+      "name": "agent-notebook-guidance",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-notebook-guidance"
+      },
+      "description": "|-"
+    },
+    {
+      "name": "agent-observability-and-instrumentation",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-observability-and-instrumentation"
+      },
+      "description": "Instruments code so production behavior is visible and diagnosable. Use when adding logging, metrics, tracing, or alerting. Use when shipping any feature that runs in production and you need evidence it works. Use when production issues are"
+    },
+    {
+      "name": "agent-opentikz",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-opentikz"
+      },
+      "description": "Use when a user wants a TikZ figure for a paper — an icon, an editable architecture/pipeline/flow template, or an example — and wants you to find, edit, and verify it. The single repo-wide skill for working with the OpenTikZ library."
+    },
+    {
+      "name": "agent-penetration-testing-with-strix",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-penetration-testing-with-strix"
+      },
+      "description": "Pentest a web app, API, codebase, repository, URL, domain, or IP with Strix — autonomous AI penetration testing that exploits and proves vulnerabilities (OWASP Top 10 and beyond — injection, XSS, SSRF, auth/access-control flaws, IDOR, busin"
+    },
+    {
+      "name": "agent-performance-optimization",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-performance-optimization"
+      },
+      "description": "Optimizes application performance across frontend, backend, queries, and databases. Use when performance requirements exist, when you suspect performance regressions, when Core Web Vitals or load times need improvement, when N+1 query patte"
+    },
+    {
+      "name": "agent-ph227-assignment",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ph227-assignment"
+      },
+      "description": "Guide and standard workflow for solving IIT Bombay PH227 (AI and Data Science) lab assignments and tutorial sheets. Use whenever working on PH227 tutorial sheets, lab assignments, or creating Jupyter notebooks for PH227 courses."
+    },
+    {
+      "name": "agent-planning-and-task-breakdown",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-planning-and-task-breakdown"
+      },
+      "description": "Breaks work into ordered tasks. Use when you have a spec or clear requirements and need to break work into implementable tasks. Use when a task feels too large to start, when you need to estimate scope, or when parallel work is possible."
+    },
+    {
+      "name": "agent-ponytail",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ponytail"
+      },
+      "description": ">"
+    },
+    {
+      "name": "agent-ponytail-audit",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ponytail-audit"
+      },
+      "description": ">"
+    },
+    {
+      "name": "agent-ponytail-debt",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ponytail-debt"
+      },
+      "description": ">"
+    },
+    {
+      "name": "agent-ponytail-gain",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ponytail-gain"
+      },
+      "description": ">"
+    },
+    {
+      "name": "agent-ponytail-help",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ponytail-help"
+      },
+      "description": ">"
+    },
+    {
+      "name": "agent-ponytail-review",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ponytail-review"
+      },
+      "description": ">"
+    },
+    {
+      "name": "agent-ppt-master",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ppt-master"
+      },
+      "description": ">"
+    },
+    {
+      "name": "agent-ppt-master-skills-ppt-master",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ppt-master-skills-ppt-master"
+      },
+      "description": ">"
+    },
+    {
+      "name": "agent-python-appservice-deploy",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-python-appservice-deploy"
+      },
+      "description": "Deploy Python (Flask/Django/FastAPI) code to Azure App Service Linux. WHEN: \\\"Flask App Service\\\", \\\"Django App Service\\\", \\\"FastAPI App Service\\\", \\\"deploy Python to App Service\\\". DO NOT USE FOR: Container Apps, Functions, non-Python, Ter"
+    },
+    {
+      "name": "agent-reverse-engineer-anything",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-reverse-engineer-anything"
+      },
+      "description": "Reverse engineer native, managed, Electron/JavaScript, packaged, firmware, and browser targets with REA. Use shipped-artifact or requested runtime evidence to explain features, compare versions, decompile code, or guide a reconstruction. Sk"
+    },
+    {
+      "name": "agent-review-animations",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-review-animations"
+      },
+      "description": "Reviews animation and motion code against a high craft bar derived from Emil Kowalski's design engineering philosophy. Default to flagging; approval is earned."
+    },
+    {
+      "name": "agent-schema-mapping",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-schema-mapping"
+      },
+      "description": "Guides the process of analyzing, mapping, and documenting transformations"
+    },
+    {
+      "name": "agent-security-and-hardening",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-security-and-hardening"
+      },
+      "description": "Hardens code against vulnerabilities. Use when auditing an input handler for vulnerabilities, when handling user input, authentication, data storage, or external integrations, or when checking a login flow is safe against the OWASP Top Ten."
+    },
+    {
+      "name": "agent-shipping-and-launch",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-shipping-and-launch"
+      },
+      "description": "Prepares production launches. Use when preparing to deploy to production, or when asking what needs to be in place before shipping. Use when you need a pre-launch checklist, when setting up monitoring, when planning a staged rollout, or whe"
+    },
+    {
+      "name": "agent-skill-repair",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-skill-repair"
+      },
+      "description": "|"
+    },
+    {
+      "name": "agent-slide-design-skill",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-slide-design-skill"
+      },
+      "description": "Design and generate polished, on-brand presentation decks as clean 1920×1080 HTML — with real charts, tables, and AI or stock imagery. Use whenever someone wants to create, design, or improve a presentation, slide deck, pitch deck, investor"
+    },
+    {
+      "name": "agent-slides",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-slides"
+      },
+      "description": "Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies."
+    },
+    {
+      "name": "agent-source-driven-development",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-source-driven-development"
+      },
+      "description": "Grounds every implementation decision in official documentation. Use when you want to verify an approach against the official docs before implementing it, or when you want authoritative, source-cited code free from outdated patterns. Use wh"
+    },
+    {
+      "name": "agent-spec-driven-development",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-spec-driven-development"
+      },
+      "description": "Creates specs before coding. Use when starting a new project, feature, or significant change and no specification exists yet. Use when drafting a PRD or requirements document with objectives and scope, or when requirements are unclear, ambi"
+    },
+    {
+      "name": "agent-test-driven-development",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-test-driven-development"
+      },
+      "description": "Drives development with tests using the red-green-refactor loop. Use when implementing any logic, fixing any bug, or changing any behavior. Use when you need to prove that code works, when a bug report arrives, or when you're about to modif"
+    },
+    {
+      "name": "agent-threejs-animation",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-threejs-animation"
+      },
+      "description": "Three.js animation - keyframe animation, skeletal animation, morph targets, animation mixing. Use when animating objects, playing GLTF animations, creating procedural motion, or blending animations."
+    },
+    {
+      "name": "agent-transitions-dev",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-transitions-dev"
+      },
+      "description": "Production-ready CSS transitions for web apps. Use when implementing notification badges, dropdowns, modals, panel reveals, page transitions, card resizes, number pop-ins, text swaps, icon swaps, success checks, avatar group hovers, error s"
+    },
+    {
+      "name": "agent-transitions-polish",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-transitions-polish"
+      },
+      "description": "Polish and refine existing motion against the transitions.dev motion-token scale — duration, distance, scale, blur, and easing — plus the rules for WHEN each token applies (open/close asymmetry, hover-in vs hover-out, stagger offsets, and i"
+    },
+    {
+      "name": "agent-transitions-ui-generation",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-transitions-ui-generation"
+      },
+      "description": "Make any UI appear as if an AI agent is generating it. A dotted wireframe is drawn from the element's own structure (outline, boxes, text lines, icon paths, with guides, corner handles and size labels), then the real UI is revealed behind a"
+    },
+    {
+      "name": "agent-ui-styling",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ui-styling"
+      },
+      "description": "Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. Use when building user interfaces, implementing design systems, crea"
+    },
+    {
+      "name": "agent-ui-ux-pro-max",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-ui-ux-pro-max"
+      },
+      "description": "UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, components, design systems, accessibility, interaction, responsive layout, typogra"
+    },
+    {
+      "name": "agent-using-agent-skills",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-using-agent-skills"
+      },
+      "description": "Discovers and invokes agent skills. Use when starting a session, or when you need to decide which skill or workflow applies to the piece of work at hand. This is the meta-skill that governs how all other skills are discovered and invoked."
+    },
+    {
+      "name": "agent-watch",
+      "source": {
+        "source": "local",
+        "path": "./skills/agent-watch"
+      },
+      "description": "Watch a video (URL or local path). Downloads with yt-dlp, extracts auto-scaled frames with ffmpeg, pulls the transcript from captions (or Whisper API fallback), and hands the result to Claude so it can answer questions about what's in the v"
+    },
+    {
+      "name": "codex-academic-report-runtime",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-academic-report-runtime"
+      },
+      "description": "Use the configured local Python and LaTeX runtimes when generating academic reports, physics lab reports, plots, numerical analysis, or DOCX exports with the installed report skills."
+    },
+    {
+      "name": "codex-codebase-memory",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-codebase-memory"
+      },
+      "description": "Use the codebase knowledge graph for structural code queries. Triggers on: explore the codebase, understand the architecture, what functions exist, show me the structure, who calls this function, what does X call, trace the call chain, find"
+    },
+    {
+      "name": "codex-document-formatting",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-document-formatting"
+      },
+      "description": "Professionally edit and format academic reports, theses, research manuscripts, and lab reports into polished Word, LaTeX, or PDF deliverables. Use for editorial refinement, publisher or school templates, typography, citations, equations, ta"
+    },
+    {
+      "name": "codex-document-research",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-document-research"
+      },
+      "description": "Conduct doctoral-level academic research and produce an evidence-backed research report, literature review, thesis chapter, or research proposal. Use for deep scholarly investigation, critical synthesis, research-gap analysis, or a complete"
+    },
+    {
+      "name": "codex-lab-report-craft",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-lab-report-craft"
+      },
+      "description": ">"
+    },
+    {
+      "name": "codex-report-workflow",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-report-workflow"
+      },
+      "description": "Generate, revise, validate, and export academic or educational DOCX reports with evidence, OMML equations, calculated tables, and school templates."
+    },
+    {
+      "name": "codex-report-workflow-skills-report-workflow",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-report-workflow-skills-report-workflow"
+      },
+      "description": "Generate, revise, validate, or publish evidence-backed DOCX reports through a deterministic prepare -> author -> validate -> render pipeline. Use when the user wants a lab report, academic paper, business report, proposal, or admissions rep"
+    },
+    {
+      "name": "codex-researcher-brainstorming",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-brainstorming"
+      },
+      "description": "Socratic research design refinement through guided questioning. Triggers when user says: 'brainstorm', 'brainstorm research directions', 'research idea', 'ideas for a follow-up study', 'refine my question', 'help me think through', 'explore"
+    },
+    {
+      "name": "codex-researcher-citation-audit",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-citation-audit"
+      },
+      "description": "Audit every citation in a manuscript for existence and for faithfulness. Triggers when user says: 'audit my citations', 'verify all citations', 'check every reference', 'citation integrity check', 'do my sources exist', 'are my citations re"
+    },
+    {
+      "name": "codex-researcher-citation-context",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-citation-context"
+      },
+      "description": "Analyze how citations are used: supportive, contrastive, or mentioning. Triggers: citation context, how is this cited, citation framing, analyze citations, citation roles, supporting vs contrasting, citation audit, check citation framing."
+    },
+    {
+      "name": "codex-researcher-citation-management",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-citation-management"
+      },
+      "description": "Manage bibliography, sync Zotero/Mendeley, validate DOIs, convert citation formats. Triggers: add citation, manage bibliography, sync zotero, import references, check citations, validate bib, convert citations."
+    },
+    {
+      "name": "codex-researcher-code-analysis",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-code-analysis"
+      },
+      "description": "Analyze a source-code repository that already exists and turn it into publication text. Triggers: analyze codebase, describe implementation, methods from code, write the methods section from my source code, document algorithm as pseudocode,"
+    },
+    {
+      "name": "codex-researcher-conference-finder",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-conference-finder"
+      },
+      "description": "Find relevant academic conferences and workshops for paper submission. Triggers: find conference, conference deadline, where to present, CFP, call for papers, upcoming conferences, submit to conference, conference recommendation, workshop d"
+    },
+    {
+      "name": "codex-researcher-contradiction-detection",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-contradiction-detection"
+      },
+      "description": "Mine contrasting evidence for a claim (or a manuscript's claim list) and build a contradiction matrix. Triggers when user says: 'find contradicting evidence', 'is this contested', 'who disagrees with this', 'contrasting studies', 'conflicti"
+    },
+    {
+      "name": "codex-researcher-cover-letter",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-cover-letter"
+      },
+      "description": "Write the cover letter that accompanies a manuscript submission to a journal editor. Triggers: write cover letter, submission letter, cover letter for journal, letter to editor, letter explaining why the paper fits the scope, cover letter f"
+    },
+    {
+      "name": "codex-researcher-experiment-design",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-experiment-design"
+      },
+      "description": "Design experiments and studies from research questions. Triggers when user says: 'design experiment', 'study design', 'experimental setup', 'how should I test this', 'plan my study', 'ablation study', 'baseline comparison', 'research protoc"
+    },
+    {
+      "name": "codex-researcher-extraction-tables",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-extraction-tables"
+      },
+      "description": "Elicit-style structured data extraction into an evidence table. Triggers when the user says: 'extraction table', 'extract data from these papers', 'structured extraction', 'data extraction', 'build an evidence table', 'pull the numbers from"
+    },
+    {
+      "name": "codex-researcher-fact-checking",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-fact-checking"
+      },
+      "description": "Verify scientific claims against published literature. Triggers when user says: 'fact check', 'verify claim', 'is this true', 'check this statement', 'verify citations', 'evidence for', 'is this supported', 'check my claims', 'validate find"
+    },
+    {
+      "name": "codex-researcher-figure-suggestions",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-figure-suggestions"
+      },
+      "description": "Recommend which figures a manuscript needs and where they go: chart type choice, figure versus table decisions, panel layout, placement, and a caption plan for each section. Triggers: suggest figures, what figures should I include, what cha"
+    },
+    {
+      "name": "codex-researcher-image-prompt-crafting",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-image-prompt-crafting"
+      },
+      "description": "Craft high-quality prompts for external image generators for conceptual illustrations, graphical abstracts, and cover art. Triggers: image generation prompt, DALL-E prompt, Midjourney prompt, graphical abstract, journal cover art, illustrat"
+    },
+    {
+      "name": "codex-researcher-implementation",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-implementation"
+      },
+      "description": "Write and run the actual code for a research project: baseline models, data loaders, training loops, evaluation scripts, and experiment runs with logged metrics. Triggers: implement this, write the code, code this algorithm, implement the b"
+    },
+    {
+      "name": "codex-researcher-journal-finder",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-journal-finder"
+      },
+      "description": "Recommend which journal to submit a finished manuscript to, weighing topic fit, scope, impact factor, APC, and review turnaround. Triggers: find journal, recommend journal, where to publish, where should I submit this paper, which journal, "
+    },
+    {
+      "name": "codex-researcher-journal-formatting",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-journal-formatting"
+      },
+      "description": "Reformat a manuscript that already exists to a target journal or conference template: the publisher LaTeX class file (elsarticle, IEEEtran, acmart, svjour3), two-column layout, section order, length limits, and the reference and citation st"
+    },
+    {
+      "name": "codex-researcher-latex-tables",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-latex-tables"
+      },
+      "description": "Typeset numbers you already have as a publication-quality LaTeX table. Triggers: create table, format table, results table, comparison table, booktabs table, turn these numbers into a table, bold the best result in each column, multicolumn "
+    },
+    {
+      "name": "codex-researcher-literature-monitoring",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-literature-monitoring"
+      },
+      "description": "Keep a review current with a standing saved search that reports only what is NEW since the last run. Triggers when user says: 'watch this topic', 'watch topic', 'living review', 'monitor literature', 'monitor the literature', 'alert me to n"
+    },
+    {
+      "name": "codex-researcher-literature-search",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-literature-search"
+      },
+      "description": "Search academic literature across multiple databases. Triggers when user says: 'search literature', 'find papers', 'literature review', 'what does research say about', 'find related work', 'search PubMed', 'search arXiv', 'find citations', "
+    },
+    {
+      "name": "codex-researcher-manuscript-setup",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-manuscript-setup"
+      },
+      "description": "Create a new academic manuscript project with an organized folder structure. Triggers when user says: 'new manuscript', 'start a paper', 'create manuscript', 'new research project', 'set up paper', 'begin writing paper', 'initialize manuscr"
+    },
+    {
+      "name": "codex-researcher-paper-drafting",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-paper-drafting"
+      },
+      "description": "Draft new academic prose: paper outlines and the text of individual sections. Triggers: draft outline, write section, draft paper, outline paper, write introduction, write methods, write results, write discussion, write abstract, write conc"
+    },
+    {
+      "name": "codex-researcher-peer-review",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-peer-review"
+      },
+      "description": "Multi-perspective academic peer review of a manuscript, with scoring rubrics. Triggers when user says: 'review this paper', 'peer review', 'critique manuscript', 'assess quality', 'evaluate paper', 'quick assessment', 'check methodology', '"
+    },
+    {
+      "name": "codex-researcher-plotneuralnet",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-plotneuralnet"
+      },
+      "description": "Generate publication-quality neural network architecture diagrams using PlotNeuralNet-style TikZ, drawn layer by layer with conv, pooling, and feature-map blocks. Triggers: neural network diagram, plot neural net, architecture diagram, draw"
+    },
+    {
+      "name": "codex-researcher-research-convergence",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-research-convergence"
+      },
+      "description": "Deep multi-source research that converges on a defensible thesis or position. Triggers: converge on argument, build thesis, research argument, socratic mode, deep research, flash search, argument map, refine thesis, challenge my argument, c"
+    },
+    {
+      "name": "codex-researcher-research-gaps",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-research-gaps"
+      },
+      "description": "Systematically identify research gaps from an analysis of the literature that exists. Triggers: find research gaps, identify gaps, what is missing in the literature, unexplored areas, find an underexplored angle, open problems in this field"
+    },
+    {
+      "name": "codex-researcher-research-pipeline",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-research-pipeline"
+      },
+      "description": "Run the full research pipeline as staged, checkpointed work. Triggers when user says: 'run the pipeline', 'research pipeline', 'end to end paper', 'take this from question to submission', 'full workflow', 'plan to draft to review', 'orchest"
+    },
+    {
+      "name": "codex-researcher-response-to-reviewers",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-response-to-reviewers"
+      },
+      "description": "Write the formal point-by-point response document that answers each reviewer and editor comment after a decision. Triggers: response to reviewers, write rebuttal, reviewer response, point by point response, reply to the reviewer comments, a"
+    },
+    {
+      "name": "codex-researcher-revision-management",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-revision-management"
+      },
+      "description": "Plan and carry out the manuscript edits a review round demands, and track them across sections. Triggers: revise paper, address comments, reviewer asked, revision round, tracked changes, manage revisions across sections, plan the revision w"
+    },
+    {
+      "name": "codex-researcher-skills-brainstorming",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-brainstorming"
+      },
+      "description": "Socratic research design refinement through guided questioning. Triggers when user says: 'brainstorm', 'brainstorm research directions', 'research idea', 'ideas for a follow-up study', 'refine my question', 'help me think through', 'explore"
+    },
+    {
+      "name": "codex-researcher-skills-citation-audit",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-citation-audit"
+      },
+      "description": "Audit every citation in a manuscript for existence and for faithfulness. Triggers when user says: 'audit my citations', 'verify all citations', 'check every reference', 'citation integrity check', 'do my sources exist', 'are my citations re"
+    },
+    {
+      "name": "codex-researcher-skills-citation-context",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-citation-context"
+      },
+      "description": "Analyze how citations are used: supportive, contrastive, or mentioning. Triggers: citation context, how is this cited, citation framing, analyze citations, citation roles, supporting vs contrasting, citation audit, check citation framing."
+    },
+    {
+      "name": "codex-researcher-skills-citation-management",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-citation-management"
+      },
+      "description": "Manage bibliography, sync Zotero/Mendeley, validate DOIs, convert citation formats. Triggers: add citation, manage bibliography, sync zotero, import references, check citations, validate bib, convert citations."
+    },
+    {
+      "name": "codex-researcher-skills-code-analysis",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-code-analysis"
+      },
+      "description": "Analyze a source-code repository that already exists and turn it into publication text. Triggers: analyze codebase, describe implementation, methods from code, write the methods section from my source code, document algorithm as pseudocode,"
+    },
+    {
+      "name": "codex-researcher-skills-conference-finder",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-conference-finder"
+      },
+      "description": "Find relevant academic conferences and workshops for paper submission. Triggers: find conference, conference deadline, where to present, CFP, call for papers, upcoming conferences, submit to conference, conference recommendation, workshop d"
+    },
+    {
+      "name": "codex-researcher-skills-contradiction-detection",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-contradiction-detection"
+      },
+      "description": "Mine contrasting evidence for a claim (or a manuscript's claim list) and build a contradiction matrix. Triggers when user says: 'find contradicting evidence', 'is this contested', 'who disagrees with this', 'contrasting studies', 'conflicti"
+    },
+    {
+      "name": "codex-researcher-skills-cover-letter",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-cover-letter"
+      },
+      "description": "Write the cover letter that accompanies a manuscript submission to a journal editor. Triggers: write cover letter, submission letter, cover letter for journal, letter to editor, letter explaining why the paper fits the scope, cover letter f"
+    },
+    {
+      "name": "codex-researcher-skills-experiment-design",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-experiment-design"
+      },
+      "description": "Design experiments and studies from research questions. Triggers when user says: 'design experiment', 'study design', 'experimental setup', 'how should I test this', 'plan my study', 'ablation study', 'baseline comparison', 'research protoc"
+    },
+    {
+      "name": "codex-researcher-skills-extraction-tables",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-extraction-tables"
+      },
+      "description": "Elicit-style structured data extraction into an evidence table. Triggers when the user says: 'extraction table', 'extract data from these papers', 'structured extraction', 'data extraction', 'build an evidence table', 'pull the numbers from"
+    },
+    {
+      "name": "codex-researcher-skills-fact-checking",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-fact-checking"
+      },
+      "description": "Verify scientific claims against published literature. Triggers when user says: 'fact check', 'verify claim', 'is this true', 'check this statement', 'verify citations', 'evidence for', 'is this supported', 'check my claims', 'validate find"
+    },
+    {
+      "name": "codex-researcher-skills-figure-suggestions",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-figure-suggestions"
+      },
+      "description": "Recommend which figures a manuscript needs and where they go: chart type choice, figure versus table decisions, panel layout, placement, and a caption plan for each section. Triggers: suggest figures, what figures should I include, what cha"
+    },
+    {
+      "name": "codex-researcher-skills-image-prompt-crafting",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-image-prompt-crafting"
+      },
+      "description": "Craft high-quality prompts for external image generators for conceptual illustrations, graphical abstracts, and cover art. Triggers: image generation prompt, DALL-E prompt, Midjourney prompt, graphical abstract, journal cover art, illustrat"
+    },
+    {
+      "name": "codex-researcher-skills-implementation",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-implementation"
+      },
+      "description": "Write and run the actual code for a research project: baseline models, data loaders, training loops, evaluation scripts, and experiment runs with logged metrics. Triggers: implement this, write the code, code this algorithm, implement the b"
+    },
+    {
+      "name": "codex-researcher-skills-journal-finder",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-journal-finder"
+      },
+      "description": "Recommend which journal to submit a finished manuscript to, weighing topic fit, scope, impact factor, APC, and review turnaround. Triggers: find journal, recommend journal, where to publish, where should I submit this paper, which journal, "
+    },
+    {
+      "name": "codex-researcher-skills-journal-formatting",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-journal-formatting"
+      },
+      "description": "Reformat a manuscript that already exists to a target journal or conference template: the publisher LaTeX class file (elsarticle, IEEEtran, acmart, svjour3), two-column layout, section order, length limits, and the reference and citation st"
+    },
+    {
+      "name": "codex-researcher-skills-latex-tables",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-latex-tables"
+      },
+      "description": "Typeset numbers you already have as a publication-quality LaTeX table. Triggers: create table, format table, results table, comparison table, booktabs table, turn these numbers into a table, bold the best result in each column, multicolumn "
+    },
+    {
+      "name": "codex-researcher-skills-literature-monitoring",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-literature-monitoring"
+      },
+      "description": "Keep a review current with a standing saved search that reports only what is NEW since the last run. Triggers when user says: 'watch this topic', 'watch topic', 'living review', 'monitor literature', 'monitor the literature', 'alert me to n"
+    },
+    {
+      "name": "codex-researcher-skills-literature-search",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-literature-search"
+      },
+      "description": "Search academic literature across multiple databases. Triggers when user says: 'search literature', 'find papers', 'literature review', 'what does research say about', 'find related work', 'search PubMed', 'search arXiv', 'find citations', "
+    },
+    {
+      "name": "codex-researcher-skills-manuscript-setup",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-manuscript-setup"
+      },
+      "description": "Create a new academic manuscript project with an organized folder structure. Triggers when user says: 'new manuscript', 'start a paper', 'create manuscript', 'new research project', 'set up paper', 'begin writing paper', 'initialize manuscr"
+    },
+    {
+      "name": "codex-researcher-skills-paper-drafting",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-paper-drafting"
+      },
+      "description": "Draft new academic prose: paper outlines and the text of individual sections. Triggers: draft outline, write section, draft paper, outline paper, write introduction, write methods, write results, write discussion, write abstract, write conc"
+    },
+    {
+      "name": "codex-researcher-skills-peer-review",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-peer-review"
+      },
+      "description": "Multi-perspective academic peer review of a manuscript, with scoring rubrics. Triggers when user says: 'review this paper', 'peer review', 'critique manuscript', 'assess quality', 'evaluate paper', 'quick assessment', 'check methodology', '"
+    },
+    {
+      "name": "codex-researcher-skills-plotneuralnet",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-plotneuralnet"
+      },
+      "description": "Generate publication-quality neural network architecture diagrams using PlotNeuralNet-style TikZ, drawn layer by layer with conv, pooling, and feature-map blocks. Triggers: neural network diagram, plot neural net, architecture diagram, draw"
+    },
+    {
+      "name": "codex-researcher-skills-research-convergence",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-research-convergence"
+      },
+      "description": "Deep multi-source research that converges on a defensible thesis or position. Triggers: converge on argument, build thesis, research argument, socratic mode, deep research, flash search, argument map, refine thesis, challenge my argument, c"
+    },
+    {
+      "name": "codex-researcher-skills-research-gaps",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-research-gaps"
+      },
+      "description": "Systematically identify research gaps from an analysis of the literature that exists. Triggers: find research gaps, identify gaps, what is missing in the literature, unexplored areas, find an underexplored angle, open problems in this field"
+    },
+    {
+      "name": "codex-researcher-skills-research-pipeline",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-research-pipeline"
+      },
+      "description": "Run the full research pipeline as staged, checkpointed work. Triggers when user says: 'run the pipeline', 'research pipeline', 'end to end paper', 'take this from question to submission', 'full workflow', 'plan to draft to review', 'orchest"
+    },
+    {
+      "name": "codex-researcher-skills-response-to-reviewers",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-response-to-reviewers"
+      },
+      "description": "Write the formal point-by-point response document that answers each reviewer and editor comment after a decision. Triggers: response to reviewers, write rebuttal, reviewer response, point by point response, reply to the reviewer comments, a"
+    },
+    {
+      "name": "codex-researcher-skills-revision-management",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-revision-management"
+      },
+      "description": "Plan and carry out the manuscript edits a review round demands, and track them across sections. Triggers: revise paper, address comments, reviewer asked, revision round, tracked changes, manage revisions across sections, plan the revision w"
+    },
+    {
+      "name": "codex-researcher-skills-sota-finder",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-sota-finder"
+      },
+      "description": "Find and track state-of-the-art results for research tasks and benchmarks, and assemble the SOTA comparison table from what has actually been reported. Triggers: state of the art, SOTA, best results, current best, benchmark results, leaderb"
+    },
+    {
+      "name": "codex-researcher-skills-statistical-analysis",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-statistical-analysis"
+      },
+      "description": "Statistical method selection, guidance, and results reporting. Triggers when user says: 'which statistical test', 'analyze data', 'statistical analysis', 'p-value', 'significance test', 'power analysis', 'sample size calculation', 'effect s"
+    },
+    {
+      "name": "codex-researcher-skills-systematic-review",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-systematic-review"
+      },
+      "description": "Run a methodologically defensible systematic review end to end over the provenance ledger. Triggers when user says: 'systematic review', 'PRISMA', 'PRISMA flow diagram', 'screening', 'title and abstract screening', 'dual screening', 'dual i"
+    },
+    {
+      "name": "codex-researcher-skills-tikz-diagrams",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-tikz-diagrams"
+      },
+      "description": "Generate TikZ/PGF schematics for academic papers: pipelines, system architectures, flowcharts, block diagrams, and process figures drawn as vector LaTeX. Triggers: create diagram, draw architecture, tikz figure, system diagram, flowchart, p"
+    },
+    {
+      "name": "codex-researcher-skills-visualization",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-visualization"
+      },
+      "description": "Generate publication-quality data visualizations with matplotlib, seaborn, ggplot2, pgfplots. Triggers: plot data, create chart, visualize results, make figure, bar chart, scatter plot, heatmap, line plot, plot the accuracy curve, plot the "
+    },
+    {
+      "name": "codex-researcher-skills-word-output",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-word-output"
+      },
+      "description": "Generate Microsoft Word DOCX output from a manuscript folder. Triggers: word format, docx output, Microsoft Word, not latex, convert to word, build docx, submit as .docx, give me a DOCX version of the draft, the journal wants docx. It conve"
+    },
+    {
+      "name": "codex-researcher-skills-writing-style-analysis",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-skills-writing-style-analysis"
+      },
+      "description": "Analyze and emulate academic writing style: build a reusable style profile from prose that already exists, covering tone, voice, register, sentence length, hedging, and consistency across sections. Triggers: analyze my writing style, check "
+    },
+    {
+      "name": "codex-researcher-sota-finder",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-sota-finder"
+      },
+      "description": "Find and track state-of-the-art results for research tasks and benchmarks, and assemble the SOTA comparison table from what has actually been reported. Triggers: state of the art, SOTA, best results, current best, benchmark results, leaderb"
+    },
+    {
+      "name": "codex-researcher-statistical-analysis",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-statistical-analysis"
+      },
+      "description": "Statistical method selection, guidance, and results reporting. Triggers when user says: 'which statistical test', 'analyze data', 'statistical analysis', 'p-value', 'significance test', 'power analysis', 'sample size calculation', 'effect s"
+    },
+    {
+      "name": "codex-researcher-systematic-review",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-systematic-review"
+      },
+      "description": "Run a methodologically defensible systematic review end to end over the provenance ledger. Triggers when user says: 'systematic review', 'PRISMA', 'PRISMA flow diagram', 'screening', 'title and abstract screening', 'dual screening', 'dual i"
+    },
+    {
+      "name": "codex-researcher-tikz-diagrams",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-tikz-diagrams"
+      },
+      "description": "Generate TikZ/PGF schematics for academic papers: pipelines, system architectures, flowcharts, block diagrams, and process figures drawn as vector LaTeX. Triggers: create diagram, draw architecture, tikz figure, system diagram, flowchart, p"
+    },
+    {
+      "name": "codex-researcher-visualization",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-visualization"
+      },
+      "description": "Generate publication-quality data visualizations with matplotlib, seaborn, ggplot2, pgfplots. Triggers: plot data, create chart, visualize results, make figure, bar chart, scatter plot, heatmap, line plot, plot the accuracy curve, plot the "
+    },
+    {
+      "name": "codex-researcher-word-output",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-word-output"
+      },
+      "description": "Generate Microsoft Word DOCX output from a manuscript folder. Triggers: word format, docx output, Microsoft Word, not latex, convert to word, build docx, submit as .docx, give me a DOCX version of the draft, the journal wants docx. It conve"
+    },
+    {
+      "name": "codex-researcher-writing-style-analysis",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-researcher-writing-style-analysis"
+      },
+      "description": "Analyze and emulate academic writing style: build a reusable style profile from prose that already exists, covering tone, voice, register, sentence length, hedging, and consistency across sections. Triggers: analyze my writing style, check "
+    },
+    {
+      "name": "codex-reverse-engineer-anything",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-reverse-engineer-anything"
+      },
+      "description": "Reverse engineer native, managed, Electron/JavaScript, packaged, firmware, and browser targets with REA. Use shipped-artifact or requested runtime evidence to explain features, compare versions, decompile code, or guide a reconstruction. Sk"
+    },
+    {
+      "name": "codex-typesafe-ai",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-typesafe-ai"
+      },
+      "description": ">"
+    },
+    {
+      "name": "codex-voicestudio",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-voicestudio"
+      },
+      "description": "Generate local speech with saved or designed voices, transcribe audio, and automate dubbing or narration workflows through VoiceStudio's REST API or MCP server. Use when the user wants to work with VoiceStudio audio or connect it to an agen"
+    }
+  ]
+}

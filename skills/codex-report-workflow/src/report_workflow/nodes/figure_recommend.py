@@ -1,0 +1,1448 @@
+"""FIGURE_RECOMMEND node.
+
+This module keeps chart choice deterministic and inspectable. It does not
+author prose; it recommends chart types from table-shaped evidence.
+"""
+from __future__ import annotations
+
+import re
+from pathlib import Path
+from typing import Any
+
+from ..language import CJK_RE
+from ..runtime_support import load_jsonl, write_json_artifact
+from ..state import ReportState
+from .figure_utils import (
+    clean_text as _clean_text,
+    parse_measure as _parse_measure,
+    to_float as _to_float,
+    unit_signature as _unit_signature,
+    unparsed_reason as _unparsed_reason,
+)
+from .table_transform import _time_sort_key, build_table_variants
+
+
+MAX_CHART_ROWS = 24
+MAX_TABLE_FIGURE_ROWS = 12
+MIN_CHART_ROWS = 2
+MIN_DISTRIBUTION_POINTS = 8
+NUMERIC_RATIO_THRESHOLD = 0.75
+MAX_PIE_SLICES = 6
+MAX_BAR_CATEGORIES = 12
+MAX_LINE_SCATTER_POINTS = 50
+MAX_TABLE_COLUMNS = 6
+MAX_CATEGORY_LABEL_LENGTH = 35
+MAX_LINE_BAR_SERIES = 3
+MAX_STACKED_BAR_SERIES = 6
+MAX_HEATMAP_ROWS = 16
+MAX_HEATMAP_COLUMNS = 12
+
+TIME_HEADER_TERMS = {
+    "time",
+    "date",
+    "day",
+    "week",
+    "month",
+    "year",
+    "period",
+    "step",
+    "trial",
+    "run",
+    "sample",
+    "iteration",
+    "timestamp",
+}
+COMPOSITION_TERMS = {
+    "share",
+    "percent",
+    "percentage",
+    "%",
+    "ratio",
+    "proportion",
+    "composition",
+    "distribution",
+    "breakdown",
+    "allocation",
+}
+STACKED_BAR_TERMS = {
+    "share",
+    "percent",
+    "percentage",
+    "%",
+    "ratio",
+    "proportion",
+    "composition",
+    "breakdown",
+    "allocation",
+}
+ID_HEADER_TERMS = {
+    "id",
+    "identifier",
+    "index",
+    "record id",
+    "row id",
+    "serial",
+    "no",
+    "sample id",
+    "sample number",
+    "specimen id",
+    "specimen number",
+    # A run counter is what a lab sheet actually heads its first column with,
+    # in either language, and none of the terms above reach it. 次數 is
+    # deliberately absent: a count is a measurement, not an identifier.
+    "trial",
+    "run no",
+    "test no",
+    "編號",
+    "序號",
+    "試次",
+}
+PARAMETER_TABLE_TERMS = {
+    "parameter",
+    "variable",
+    "symbol",
+    "formula",
+    "constant",
+    "calculation",
+}
+ERROR_HEADER_TERMS = {
+    "error",
+    "err",
+    "sd",
+    "std",
+    "standard deviation",
+    "se",
+    "sem",
+    "standard error",
+    "ci",
+    "confidence interval",
+    "uncertainty",
+    "margin",
+    "deviation",
+}
+MATRIX_TERMS = {
+    "matrix",
+    "heatmap",
+    "grid",
+    "correlation",
+    "confusion",
+    "intensity",
+}
+GROUPED_DISTRIBUTION_TERMS = {
+    "boxplot",
+    "box plot",
+    "distribution",
+    "replicate",
+    "replicates",
+    "sample",
+    "samples",
+    "variation",
+    "spread",
+}
+TEXT_MIXED_ROLE = "text/mixed"
+
+
+def _rows_from_table_data(table_data: Any) -> list[list[str]]:
+    if not isinstance(table_data, list):
+        return []
+    rows: list[list[str]] = []
+    for row in table_data:
+        if isinstance(row, list):
+            rows.append([_clean_text(cell) for cell in row])
+        elif isinstance(row, dict):
+            if not rows:
+                rows.append([_clean_text(key) for key in row.keys()])
+            rows.append([_clean_text(value) for value in row.values()])
+    width = max((len(row) for row in rows), default=0)
+    if width == 0:
+        return []
+    normalized = [row + [""] * (width - len(row)) for row in rows]
+    return [row for row in normalized if any(cell for cell in row)]
+
+
+#: Columns that identify a record rather than measure it. Charting them
+#: produced a "figure" titled `title and 10 other measures by asin` whose
+#: series were 544 Amazon tracking URLs and thumbnail links — the ledger
+#: reprinted as a picture. The outline gate refused it, correctly, but it was
+#: still the first thing the pipeline put in front of the author, and it
+#: demonstrates the exact failure the rest of this file exists to avoid.
+_UNPLOTTABLE_COLUMN_RE = re.compile(
+    r"(?:^|[_\s-])(?:id|ids|asin|sku|upc|ean|isbn|uuid|guid)(?:$|[_\s-])"
+    r"|^(?:id|asin|sku|url|link|image|img|photo|thumbnail|description)"
+    r"|(?:url|link|image|img|photo|thumbnail|src|href)$",
+    re.IGNORECASE,
+)
+
+
+def _plottable(rows: list[list[str]]) -> list[list[str]]:
+    """The same table with its identifier and link columns taken out.
+
+    Dropping columns only ever improves a table here; it never deletes one. A
+    two-column reading indexed by sample id, or a single column of
+    observations, is a legitimate chart whose label happens to match the
+    pattern, and refusing those to spare the reader a tracking URL trades one
+    silent loss for another.
+    """
+    if not rows:
+        return rows
+    keep = [
+        index
+        for index, header in enumerate(rows[0])
+        if not _UNPLOTTABLE_COLUMN_RE.search(str(header))
+    ]
+    if len(keep) < 2 or len(keep) == len(rows[0]):
+        return rows
+    return [[row[index] if index < len(row) else "" for index in keep] for row in rows]
+
+
+def _table_candidates(evidence: list[dict]) -> list[dict]:
+    full_tables: list[dict] = []
+    row_groups: dict[tuple[str, str, tuple[str, ...]], dict] = {}
+
+    for entry in evidence:
+        # A derived cross table is already the aggregate a chart wants: one row
+        # per group, one column per measure, no identifiers in it. Offering
+        # these is the difference between a starter plan the author keeps and
+        # one they have to delete before the outline gate will pass.
+        grid = entry.get("table_grid")
+        if isinstance(grid, dict) and grid.get("headers") and grid.get("rows"):
+            full_tables.append({
+                "source_id": str(entry.get("source_id") or ""),
+                "source_file_name": str(entry.get("source_file_name") or ""),
+                "evidence_ids": [str(entry.get("evidence_id") or "")],
+                "rows": [
+                    [str(cell) for cell in grid["headers"]],
+                    *[[str(cell) for cell in line] for line in grid["rows"]],
+                ],
+                "content": str(entry.get("content") or ""),
+                "derived": True,
+            })
+            continue
+
+        rows = _rows_from_table_data(entry.get("table_data"))
+        if len(rows) < 2:
+            continue
+
+        evidence_id = str(entry.get("evidence_id") or "")
+        source_id = str(entry.get("source_id") or entry.get("source_file_name") or "")
+        source_file_name = str(entry.get("source_file_name") or "")
+        granularity = str(entry.get("granularity") or entry.get("block_type") or "")
+
+        if len(rows) > 2 or granularity == "table":
+            full_tables.append({
+                "source_id": source_id,
+                "source_file_name": source_file_name,
+                "evidence_ids": [evidence_id] if evidence_id else [],
+                "rows": rows,
+                "content": str(entry.get("content") or ""),
+            })
+            continue
+
+        headers = tuple(rows[0])
+        key = (source_id, source_file_name, headers)
+        group = row_groups.setdefault(key, {
+            "source_id": source_id,
+            "source_file_name": source_file_name,
+            "evidence_ids": [],
+            "rows": [list(headers)],
+            "content": "",
+        })
+        if evidence_id:
+            group["evidence_ids"].append(evidence_id)
+        group["rows"].append(rows[1])
+        group["content"] = (group["content"] + "\n" + str(entry.get("content") or "")).strip()
+
+    grouped_tables = [group for group in row_groups.values() if len(group.get("rows", [])) >= 3]
+    usable: list[dict] = []
+    for table in full_tables + grouped_tables:
+        rows = _plottable(table.get("rows") or [])
+        if not rows:
+            continue
+        usable.append({**table, "rows": rows})
+    # Aggregates before raw rows. The starter plan takes the first few
+    # recommendations, and the derived cross tables are appended to the ledger
+    # last — so in ledger order the author's starter figures were all built
+    # from per-record rows and every one of them had to be deleted.
+    usable.sort(key=lambda table: 0 if table.get("derived") else 1)
+    return usable
+
+
+def _column_values(rows: list[list[str]], index: int) -> list[str]:
+    return [row[index] for row in rows[1:] if index < len(row)]
+
+
+def _distinct_label_index(rows: list[list[str]], categorical_indices: list[int]) -> int:
+    """Pick the categorical column that actually names each bar.
+
+    A bar chart reads its label column as an identity. A quote sheet whose
+    first categorical column repeats — three rows all named 測試軸承 — draws
+    bars the reader cannot tell apart, while a later column names every row.
+    """
+    best = categorical_indices[0]
+    best_distinct = len(_unique_non_empty(_column_values(rows, best)))
+    for index in categorical_indices[1:]:
+        distinct = len(_unique_non_empty(_column_values(rows, index)))
+        if distinct > best_distinct:
+            best, best_distinct = index, distinct
+    return best
+
+
+def _numeric_values(values: list[str]) -> list[float]:
+    return [number for value in values if (number := _to_float(value)) is not None]
+
+
+def _is_numeric_column(values: list[str]) -> bool:
+    non_empty = [value for value in values if _clean_text(value)]
+    if len(non_empty) < MIN_CHART_ROWS:
+        return False
+    return len(_numeric_values(non_empty)) / len(non_empty) >= NUMERIC_RATIO_THRESHOLD
+
+
+def _is_time_like(header: str, values: list[str]) -> bool:
+    lowered = header.casefold()
+    if any(term in lowered for term in TIME_HEADER_TERMS):
+        return True
+    non_empty = [_clean_text(value) for value in values if _clean_text(value)]
+    if not non_empty:
+        return False
+    date_like = sum(1 for value in non_empty if re.search(r"\d{4}[-/]\d{1,2}|\d{1,2}:\d{2}", value))
+    parsed_time_like = sum(1 for value in non_empty if _time_sort_key(value) is not None)
+    if max(date_like, parsed_time_like) / len(non_empty) >= 0.6:
+        return True
+    return False
+
+
+def _is_composition_context(headers: list[str], values: list[float], content: str) -> bool:
+    text = " ".join(headers + [content]).casefold()
+    total = sum(values)
+    has_composition_terms = any(term in text for term in COMPOSITION_TERMS)
+    total_is_composition_like = 99 <= total <= 101 or 0.99 <= total <= 1.01
+    return has_composition_terms and total_is_composition_like
+
+
+def _unique_non_empty(values: list[str]) -> list[str]:
+    seen: set[str] = set()
+    unique: list[str] = []
+    for value in values:
+        clean = _clean_text(value)
+        if clean and clean not in seen:
+            seen.add(clean)
+            unique.append(clean)
+    return unique
+
+
+_CJK_CHAR_RE = re.compile(r"[一-鿿㐀-䶿]")
+
+
+def _header_contains(header: str, terms: set[str]) -> bool:
+    """Whether a column header carries any of these terms.
+
+    The strip kept `[a-z0-9%#]` only, so a Chinese header normalised to the
+    empty string and matched nothing at all — the same way `unit_signature`
+    used to lose CJK. A trial-number column headed 試次 was therefore never
+    recognised as an identifier, went into the measure candidates, and became
+    a chart axis: a plot of serial number against a set point, with the actual
+    measurement left off.
+
+    CJK terms match as substrings because the script is not space-delimited;
+    a word boundary would never fire inside a compound like 試驗編號. Latin
+    terms keep their boundaries, so "trial" does not match "industrial".
+    """
+    normalized = re.sub(r"[^a-z0-9%#一-鿿㐀-䶿]+", " ", header.casefold()).strip()
+    if not normalized:
+        return False
+    for term in terms:
+        term_norm = re.sub(r"[^a-z0-9%#一-鿿㐀-䶿]+", " ", term.casefold()).strip()
+        if not term_norm:
+            continue
+        if _CJK_CHAR_RE.search(term_norm):
+            if term_norm in normalized:
+                return True
+            continue
+        if " " in term_norm:
+            if term_norm in normalized:
+                return True
+            continue
+        if re.search(rf"(^|\s){re.escape(term_norm)}(\s|$)", normalized):
+            return True
+    return False
+
+
+def _is_ordered_values(values: list[str]) -> bool:
+    non_empty = [_clean_text(value) for value in values if _clean_text(value)]
+    if len(non_empty) < MIN_CHART_ROWS:
+        return False
+
+    numbers = [_to_float(value) for value in non_empty]
+    if all(number is not None for number in numbers):
+        numeric_values = [float(number) for number in numbers if number is not None]
+        deltas = [b - a for a, b in zip(numeric_values, numeric_values[1:])]
+        if not deltas:
+            return False
+        return (all(delta >= 0 for delta in deltas) or all(delta <= 0 for delta in deltas)) and any(
+            delta != 0 for delta in deltas
+        )
+
+    date_keys: list[tuple[int, ...]] = []
+    for value in non_empty:
+        key = _time_sort_key(value)
+        if key is not None:
+            date_keys.append(key)
+            continue
+        return False
+    deltas = [
+        (b > a) - (b < a)
+        for a, b in zip(date_keys, date_keys[1:])
+    ]
+    return bool(deltas) and (all(delta >= 0 for delta in deltas) or all(delta <= 0 for delta in deltas)) and any(
+        delta != 0 for delta in deltas
+    )
+
+
+def _numeric_values_for_rows(rows: list[list[str]], index: int, limit: int = MAX_CHART_ROWS) -> list[float]:
+    values: list[float] = []
+    for row in rows[1:limit + 1]:
+        number = _to_float(row[index] if index < len(row) else "")
+        if number is not None:
+            values.append(number)
+    return values
+
+
+def _is_parameter_table(headers: list[str], content: str) -> bool:
+    text = " ".join(headers + [content]).casefold()
+    return any(term in text for term in PARAMETER_TABLE_TERMS)
+
+
+def _profile_table(headers: list[str], rows: list[list[str]], content: str) -> dict:
+    data_rows = rows[1:]
+    total_cells = max(len(data_rows) * len(headers), 1)
+    missing_cells = 0
+    columns: list[dict] = []
+
+    for index, header in enumerate(headers):
+        values = _column_values(rows, index)
+        non_empty = [_clean_text(value) for value in values if _clean_text(value)]
+        missing = max(len(data_rows) - len(non_empty), 0)
+        missing_cells += missing
+        measures = [(value, _parse_measure(value)) for value in non_empty]
+        numeric_values = [m.value for _text, m in measures if m is not None]
+        # Which cells failed, and why. "No reliable numeric measure column was
+        # detected" was the whole report, and it is not actionable: it names
+        # neither the column nor the cell, so an author whose price column
+        # reads "~80,000–85,000" cannot tell whether the parser choked on the
+        # tilde, the dash, or the comma.
+        unparsed = [
+            {"value": text, "reason": _unparsed_reason(text)}
+            for text, m in measures if m is None
+        ]
+        range_count = len([m for _text, m in measures if m is not None and m.is_range])
+        approximate_count = len([m for _text, m in measures if m is not None and m.is_approximate])
+        tolerance_count = len(
+            [m for _text, m in measures if m is not None and m.tolerance is not None]
+        )
+        numeric_ratio = len(numeric_values) / len(non_empty) if non_empty else 0.0
+        negative_count = len([value for value in numeric_values if value < 0])
+        unique_values = _unique_non_empty(values)
+        unique_count = len(unique_values)
+        ordered = _is_ordered_values(values)
+
+        id_like = _header_contains(header, ID_HEADER_TERMS)
+        numeric_column = len(non_empty) >= MIN_CHART_ROWS and numeric_ratio >= NUMERIC_RATIO_THRESHOLD
+        time_like = not id_like and _is_time_like(header, values) and ordered
+        categorical = (
+            not numeric_column
+            and not time_like
+            and not id_like
+            and 2 <= unique_count <= 12
+            and (missing / max(len(data_rows), 1)) < 0.5
+        )
+
+        if id_like:
+            role = "id_like"
+        elif time_like:
+            role = "time_like"
+        elif numeric_column:
+            role = "numeric_measure"
+        elif categorical:
+            role = "categorical"
+        else:
+            role = TEXT_MIXED_ROLE
+
+        columns.append({
+            "index": index,
+            "header": header,
+            "role": role,
+            "missing_ratio": round(missing / max(len(data_rows), 1), 3),
+            "numeric_ratio": round(numeric_ratio, 3),
+            "unique_count": unique_count,
+            "ordered": ordered,
+            "unit_signature": _unit_signature(header),
+            "negative_value_count": negative_count,
+            "range_value_count": range_count,
+            "approximate_value_count": approximate_count,
+            "tolerance_value_count": tolerance_count,
+            "unparsed_cells": unparsed[:3],
+            "unparsed_cell_count": len(unparsed),
+        })
+
+    composition_total: float | None = None
+    for column in columns:
+        if column["role"] != "numeric_measure":
+            continue
+        values = _numeric_values_for_rows(rows, int(column["index"]))
+        if values and all(value >= 0 for value in values) and _is_composition_context(headers, values, content):
+            column["role"] = "composition_value"
+            composition_total = round(sum(values), 6)
+
+    role_counts: dict[str, int] = {}
+    for column in columns:
+        role_counts[column["role"]] = role_counts.get(column["role"], 0) + 1
+    # A column carrying no unit is not the same unit as one that does. A
+    # monthly table of 投產數 / 不良數 / 不良率(%) reported a single signature
+    # ("%") and so read as unmixed, putting counts in the thousands and a
+    # percentage near 2 on one shared y-axis — the defect-rate line, the
+    # entire point of the report, drew flat against the axis.
+    measure_signatures = [
+        str(column.get("unit_signature") or "")
+        for column in columns
+        if column.get("role") == "numeric_measure"
+    ]
+    measure_units = sorted({unit for unit in measure_signatures if unit})
+    mixed_measure_units = len(set(measure_signatures)) > 1
+    negative_numeric_value_count = sum(int(column.get("negative_value_count", 0) or 0) for column in columns)
+
+    return {
+        "summary": {
+            "rows": len(data_rows),
+            "columns": len(headers),
+            "missing_ratio": round(missing_cells / total_cells, 3),
+            "numeric_column_count": role_counts.get("numeric_measure", 0),
+            "categorical_column_count": role_counts.get("categorical", 0),
+            "time_like_column_count": role_counts.get("time_like", 0),
+            "id_like_column_count": role_counts.get("id_like", 0),
+            "composition_value_column_count": role_counts.get("composition_value", 0),
+            "composition_total": composition_total,
+            "parameter_table": _is_parameter_table(headers, content),
+            "measure_unit_signatures": measure_units,
+            "mixed_measure_units": mixed_measure_units,
+            "negative_numeric_value_count": negative_numeric_value_count,
+            "range_value_count": sum(int(column.get("range_value_count", 0) or 0) for column in columns),
+            "approximate_value_count": sum(int(column.get("approximate_value_count", 0) or 0) for column in columns),
+            "tolerance_value_count": sum(int(column.get("tolerance_value_count", 0) or 0) for column in columns),
+            "unparsed_cell_count": sum(int(column.get("unparsed_cell_count", 0) or 0) for column in columns),
+        },
+        "columns": columns,
+    }
+
+
+def _indices_with_role(profile: dict, role: str) -> list[int]:
+    return [int(column["index"]) for column in profile.get("columns", []) if column.get("role") == role]
+
+
+def _chart_candidate(figure_type: str, score: float, confidence: str, reason: str) -> dict:
+    return {
+        "figure_type": figure_type,
+        "score": round(score, 2),
+        "confidence": confidence,
+        "reason": reason,
+    }
+
+
+def _unparsed_cell_warnings(profile: dict) -> list[str]:
+    """Name the cells that defeated the parser, column by column.
+
+    Only for columns that held some digits — a column of prose was never a
+    measure column and saying so adds noise.
+    """
+    lines: list[str] = []
+    for column in profile.get("columns", []):
+        examples = column.get("unparsed_cells") or []
+        if not examples:
+            continue
+        if all(example.get("reason") == "no digits in cell" for example in examples):
+            continue
+        rendered = "; ".join(
+            f"{example['value']!r} ({example['reason']})" for example in examples
+        )
+        more = int(column.get("unparsed_cell_count", 0) or 0) - len(examples)
+        suffix = f" (+{more} more)" if more > 0 else ""
+        lines.append(f"Column {column.get('header')!r}: unreadable cells {rendered}{suffix}.")
+    return lines
+
+
+def _uncertainty_note(profile: dict | None, title: str) -> str:
+    """Say in the caption that the plotted values are not exact.
+
+    A range plotted at its midpoint, a figure the source hedged with "~", and
+    a reading carried with its tolerance are all points a reader would draw a
+    different conclusion from if they knew. Putting it in `selection_warnings`
+    tells the author; the caption is what tells the reader, and the reader is
+    the one holding the finished document.
+    """
+    if not profile:
+        return ""
+    summary = profile.get("summary", {})
+    zh = bool(CJK_RE.search(title))
+    notes: list[str] = []
+    if int(summary.get("range_value_count", 0) or 0):
+        notes.append("區間中點" if zh else "range midpoints")
+    if int(summary.get("approximate_value_count", 0) or 0):
+        notes.append("來源標示為近似值" if zh else "values the source marked approximate")
+    if int(summary.get("tolerance_value_count", 0) or 0):
+        notes.append("含標示誤差" if zh else "values carrying a stated tolerance")
+    if not notes:
+        return ""
+    joined = "、".join(notes) if zh else ", ".join(notes)
+    return f"（{joined}）" if zh else f" ({joined})"
+
+
+def _confidence_for_profile(confidence: str, profile: dict | None) -> str:
+    """Lower the stated confidence when the readings themselves are soft.
+
+    Every recommendation in a run reporting the same confidence is not a
+    judgement, it is a constant. A chart drawn from midpoints of ranges or
+    from figures the source itself hedged is a weaker recommendation than one
+    drawn from stated values, and the field should say so.
+    """
+    if confidence != "high" or not profile:
+        return confidence
+    summary = profile.get("summary", {})
+    softened = int(summary.get("range_value_count", 0) or 0) + int(
+        summary.get("approximate_value_count", 0) or 0
+    )
+    if not softened:
+        return confidence
+    total_cells = max(int(summary.get("rows", 0) or 0) * int(summary.get("columns", 0) or 0), 1)
+    return "medium" if softened / total_cells >= 0.25 else confidence
+
+
+def _selection_warnings(profile: dict) -> list[str]:
+    summary = profile.get("summary", {})
+    warnings: list[str] = []
+    if summary.get("missing_ratio", 0) >= 0.25:
+        warnings.append("Table has substantial missing values; preserve exact values unless a visual mapping is clearly justified.")
+    if summary.get("id_like_column_count", 0):
+        warnings.append("ID-like numeric columns were excluded from trend and relationship chart selection.")
+    if summary.get("numeric_column_count", 0) == 0 and summary.get("composition_value_column_count", 0) == 0:
+        warnings.append("No reliable numeric measure column was detected.")
+        warnings.extend(_unparsed_cell_warnings(profile))
+    if summary.get("range_value_count", 0):
+        warnings.append(
+            f"{summary['range_value_count']} cell(s) state a range and are plotted at their "
+            "midpoint; the midpoint is a summary, not a stated value."
+        )
+    if summary.get("mixed_measure_units"):
+        warnings.append("Multiple numeric measure columns have mixed units; avoid plotting them on one shared y-axis.")
+    if summary.get("negative_numeric_value_count", 0):
+        warnings.append("Negative numeric values were detected; whole-part charts such as pie or stacked bar were excluded.")
+    return warnings
+
+
+#: Section types that can carry a data figure, best first. `proposal` has no
+#: results-like section at all, so a data table belongs in its budget or
+#: deliverables section rather than in a section the blueprint never defines.
+_FIGURE_SECTION_TYPES = (
+    "results",
+    "data",
+    "findings",
+    "budget",
+    "deliverables",
+    "approach",
+    "evaluation",
+    "discussion",
+)
+
+
+def _section_for_recommendation(state: ReportState) -> str:
+    outline_sections = (state.plan.get("outline") or {}).get("sections") or {}
+    blueprint_sections = (state.plan.get("blueprint") or {}).get("sections") or {}
+    for pool in (outline_sections, blueprint_sections):
+        for section_id in ("results", "data", "results_discussion", "findings"):
+            if section_id in pool:
+                return section_id
+    for section_type in _FIGURE_SECTION_TYPES:
+        for section_id, section in blueprint_sections.items():
+            if isinstance(section, dict) and section.get("section_type") == section_type:
+                return section_id
+    return "results"
+
+
+def _series_payload(headers: list[str], rows: list[list[str]], label_index: int, numeric_indices: list[int]) -> dict:
+    labels = [_clean_text(row[label_index]) for row in rows[1:MAX_CHART_ROWS + 1]]
+    series = []
+    for index in numeric_indices:
+        values = []
+        for row in rows[1:MAX_CHART_ROWS + 1]:
+            number = _to_float(row[index] if index < len(row) else "")
+            values.append(number if number is not None else 0)
+        series.append({"name": headers[index], "values": values})
+    return {"labels": labels, "series": series}
+
+
+def _contains_terms(headers: list[str], content: str, terms: set[str]) -> bool:
+    text = " ".join(headers + [content]).casefold()
+    return any(term in text for term in terms)
+
+
+def _error_indices(headers: list[str], numeric_indices: list[int]) -> list[int]:
+    return [index for index in numeric_indices if _header_contains(headers[index], ERROR_HEADER_TERMS)]
+
+
+def _non_error_numeric_indices(headers: list[str], numeric_indices: list[int]) -> list[int]:
+    error_index_set = set(_error_indices(headers, numeric_indices))
+    return [index for index in numeric_indices if index not in error_index_set]
+
+
+def _varying_measure_indices(profile: dict, indices: list[int]) -> list[int]:
+    """Drop held-constant columns from relationship-axis candidates.
+
+    A column with a single distinct value is a controlled variable, not a
+    relationship. Held fixed on purpose — a constant inlet temperature, a
+    fixed set point — it plots as a flat line that carries no information,
+    and picking it positionally can crowd out the column the reader came for.
+
+    Composition, matrix, and distribution charts are deliberately not filtered:
+    there a constant column is a real share of the whole, not a dead axis.
+
+    Falls back to the original list when every candidate is constant, so a
+    degenerate table still produces its usual recommendation rather than none.
+    """
+    unique_counts = {
+        int(column["index"]): int(column.get("unique_count", 0))
+        for column in profile.get("columns", [])
+    }
+    varying = [index for index in indices if unique_counts.get(index, 0) > 1]
+    return varying or indices
+
+
+def _constant_column_headers(
+    profile: dict, headers: list[str], indices: list[int]
+) -> list[str]:
+    """Names of the candidates `_varying_measure_indices` would drop."""
+    kept = set(_varying_measure_indices(profile, indices))
+    return [headers[index] for index in indices if index not in kept]
+
+
+def _all_values_non_negative(rows: list[list[str]], numeric_indices: list[int]) -> bool:
+    for index in numeric_indices:
+        values = _numeric_values_for_rows(rows, index)
+        if not values or any(value < 0 for value in values):
+            return False
+    return True
+
+
+def _row_totals_are_composition_like(rows: list[list[str]], numeric_indices: list[int]) -> bool:
+    totals: list[float] = []
+    for row in rows[1:MAX_CHART_ROWS + 1]:
+        values = []
+        for index in numeric_indices:
+            number = _to_float(row[index] if index < len(row) else "")
+            if number is None:
+                values = []
+                break
+            values.append(number)
+        if values:
+            totals.append(sum(values))
+    if not totals:
+        return False
+    return all(99 <= total <= 101 or 0.99 <= total <= 1.01 for total in totals)
+
+
+def _grouped_numeric_series(rows: list[list[str]], group_index: int, value_index: int) -> list[dict]:
+    grouped: dict[str, list[float]] = {}
+    for row in rows[1:MAX_CHART_ROWS + 1]:
+        label = _clean_text(row[group_index] if group_index < len(row) else "")
+        value = _to_float(row[value_index] if value_index < len(row) else "")
+        if label and value is not None:
+            grouped.setdefault(label, []).append(value)
+    return [
+        {"name": label, "values": values}
+        for label, values in grouped.items()
+        if len(values) >= 2
+    ]
+
+
+def _numeric_column_series(headers: list[str], rows: list[list[str]], numeric_indices: list[int]) -> list[dict]:
+    series: list[dict] = []
+    for index in numeric_indices:
+        values = _numeric_values_for_rows(rows, index)
+        if len(values) >= MIN_CHART_ROWS:
+            series.append({"name": headers[index], "values": values})
+    return series
+
+
+def _heatmap_payload(headers: list[str], rows: list[list[str]], label_index: int, numeric_indices: list[int]) -> dict:
+    values: list[list[float]] = []
+    y_labels: list[str] = []
+    for row in rows[1:MAX_HEATMAP_ROWS + 1]:
+        row_values: list[float] = []
+        for index in numeric_indices[:MAX_HEATMAP_COLUMNS]:
+            number = _to_float(row[index] if index < len(row) else "")
+            if number is None:
+                row_values = []
+                break
+            row_values.append(number)
+        if row_values:
+            y_labels.append(_clean_text(row[label_index] if label_index < len(row) else ""))
+            values.append(row_values)
+    return {
+        "x_labels": [headers[index] for index in numeric_indices[:MAX_HEATMAP_COLUMNS]],
+        "y_labels": y_labels,
+        "values": values,
+    }
+
+
+def _error_bar_payload(
+    headers: list[str],
+    rows: list[list[str]],
+    label_index: int,
+    value_index: int,
+    error_index: int,
+) -> dict:
+    labels: list[str] = []
+    values: list[float] = []
+    errors: list[float] = []
+    for row in rows[1:MAX_CHART_ROWS + 1]:
+        label = _clean_text(row[label_index] if label_index < len(row) else "")
+        value = _to_float(row[value_index] if value_index < len(row) else "")
+        error = _to_float(row[error_index] if error_index < len(row) else "")
+        if label and value is not None and error is not None:
+            labels.append(label)
+            values.append(value)
+            errors.append(abs(error))
+    return {
+        "labels": labels,
+        "series": [{"name": headers[value_index], "values": values, "errors": errors}],
+    }
+
+
+def _human_figure_title(
+    figure_type: str,
+    ylabel: str,
+    xlabel: str,
+    data: dict,
+    title_source: str,
+    transform_label: str,
+) -> str:
+    """Build a reader-facing starter title from the chart's own labels.
+
+    "Bar view of chart_source" is a machine tell the prose-quality contract
+    forbids; when the data carries series names or axis labels, say what is
+    plotted ("誤報率 (%)(依階段)", "Effort hours by phase") and keep the
+    filename-based wording only as a last resort.
+    """
+    series_names: list[str] = []
+    if isinstance(data, dict):
+        for item in data.get("series", []):
+            if isinstance(item, dict):
+                name = _clean_text(str(item.get("name") or ""))
+                if name and name not in series_names:
+                    series_names.append(name)
+    # Tables carry no series and often no axis labels; their non-index
+    # columns are the subjects and the first column is the grouping key.
+    columns: list[str] = []
+    if isinstance(data, dict):
+        columns = [_clean_text(str(c)) for c in data.get("columns", []) if _clean_text(str(c))]
+    subject = ", ".join(series_names[:3]) or _clean_text(ylabel)
+    group = _clean_text(xlabel) or (columns[0] if columns else "")
+    measures = [column for column in columns[1:] if column != group]
+    if not subject and measures:
+        # Joining two column headers is a column dump, not a caption
+        # ("鋰回收, 能耗(依路線)"), and the contract that forbids `chart_source`
+        # in a caption forbids this for the same reason. A multi-measure table
+        # has no single subject: lead with what it is grouped by and how many
+        # measures it carries, and leave naming the finding to the author.
+        subject = measures[0]
+        if len(measures) > 1 and group:
+            if CJK_RE.search(subject + group):
+                return f"各{group}的{subject}等 {len(measures)} 項對照{transform_label}"
+            others = len(measures) - 1
+            noun = "measure" if others == 1 else "measures"
+            return f"{subject} and {others} other {noun} by {group}{transform_label}"
+    if subject and group and subject != group:
+        if CJK_RE.search(subject + group):
+            title = f"{subject}(依{group})"
+        else:
+            title = f"{subject} by {group}"
+    elif subject:
+        title = subject
+    else:
+        title = f"{figure_type.title()} view of {Path(str(title_source)).stem or title_source}"
+    return f"{title}{transform_label}"
+
+
+def _make_recommendation(
+    state: ReportState,
+    table: dict,
+    rec_index: int,
+    figure_type: str,
+    acceptable_types: list[str],
+    confidence: str,
+    reason: str,
+    data: dict,
+    xlabel: str = "",
+    ylabel: str = "",
+    data_profile: dict | None = None,
+    chart_candidates: list[dict] | None = None,
+    selection_warnings: list[str] | None = None,
+) -> dict:
+    rec_id = f"figrec_{rec_index}"
+    confidence = _confidence_for_profile(confidence, data_profile)
+    title_source = table.get("source_file_name") or table.get("source_id") or "source data"
+    data_transform = table.get("data_transform") if isinstance(table.get("data_transform"), dict) else None
+    transform_operations = data_transform.get("operations", []) if data_transform else []
+    transform_status = data_transform.get("status", "source") if data_transform else "source"
+    transform_label = ""
+    if transform_status == "transformed" and transform_operations:
+        transform_label = " after " + ", ".join(str(item).replace("_", " ") for item in transform_operations)
+        reason = (
+            f"{reason} Data were deterministically transformed before plotting "
+            f"({', '.join(str(item) for item in transform_operations)}); derived chart values remain tied "
+            "to the source evidence IDs."
+        )
+        if any(item == "normalize_percent" for item in transform_operations):
+            if not ylabel:
+                ylabel = "Percent of total (%)"
+            elif "%" not in ylabel and "percent" not in ylabel.casefold():
+                ylabel = f"{ylabel} (%)"
+    title = _human_figure_title(figure_type, ylabel, xlabel, data, title_source, transform_label)
+    title += _uncertainty_note(data_profile, title)
+    section_id = _section_for_recommendation(state)
+    figure_plan = {
+        "figure_id": rec_id,
+        "figure_type": figure_type,
+        "title": title,
+        "xlabel": xlabel,
+        "ylabel": ylabel,
+        "data": data,
+        "output_format": "png",
+        "section_id": section_id,
+        "recommendation_id": rec_id,
+        "source_evidence_ids": table.get("evidence_ids", []),
+        "chart_selection_reason": reason,
+    }
+    if data_transform:
+        figure_plan["data_transform"] = data_transform
+    return {
+        "recommendation_id": rec_id,
+        "source_id": table.get("source_id", ""),
+        "source_file_name": table.get("source_file_name", ""),
+        "evidence_ids": table.get("evidence_ids", []),
+        "recommended_figure_type": figure_type,
+        "acceptable_figure_types": acceptable_types,
+        "confidence": confidence,
+        "reason": reason,
+        "section_id": section_id,
+        "table_shape": {"rows": max(len(table.get("rows", [])) - 1, 0), "columns": len(table.get("rows", [[]])[0])},
+        "data_profile": data_profile or {},
+        "chart_candidates": chart_candidates or [
+            _chart_candidate(figure_type, 1.0, confidence, reason)
+        ],
+        "selection_warnings": selection_warnings or [],
+        "data_transform": data_transform or {
+            "status": "source",
+            "operations": [],
+            "input_shape": {"rows": max(len(table.get("rows", [])) - 1, 0), "columns": len(table.get("rows", [[]])[0])},
+            "output_shape": {"rows": max(len(table.get("rows", [])) - 1, 0), "columns": len(table.get("rows", [[]])[0])},
+            "warnings": [],
+            "source_evidence_ids": table.get("evidence_ids", []),
+        },
+        "figure_plan": figure_plan,
+    }
+
+
+def _recommend_single_table(state: ReportState, table: dict, rec_index: int) -> dict | None:
+    """Build one chart recommendation from one source or transformed table view."""
+    rows = table.get("rows", [])
+    if len(rows) < 3:
+        return None
+    headers = [_clean_text(header) or f"Column {index + 1}" for index, header in enumerate(rows[0])]
+    profile = _profile_table(headers, rows, table.get("content", ""))
+    summary = profile["summary"]
+    data_transform = table.get("data_transform") if isinstance(table.get("data_transform"), dict) else {}
+    warnings = _selection_warnings(profile) + list(data_transform.get("warnings", []) or [])
+    categorical_indices = _indices_with_role(profile, "categorical")
+    time_indices = _indices_with_role(profile, "time_like")
+    numeric_indices = _indices_with_role(profile, "numeric_measure")
+    composition_indices = _indices_with_role(profile, "composition_value")
+    error_indices = _error_indices(headers, numeric_indices)
+    measure_indices = _non_error_numeric_indices(headers, numeric_indices)
+    # Relationship charts (scatter, line, bar) read one column against another,
+    # so a held-constant column is a dead axis there. Composition, matrix, and
+    # distribution branches below keep the unfiltered `measure_indices`.
+    relationship_indices = _varying_measure_indices(profile, measure_indices)
+    held_constant_headers = _constant_column_headers(profile, headers, measure_indices)
+    if held_constant_headers:
+        warnings.append(
+            "Held-constant columns were excluded from relationship chart axes: "
+            + ", ".join(held_constant_headers)
+        )
+    chart_candidates: list[dict] = []
+
+    if summary.get("parameter_table") and len(rows) - 1 <= MAX_TABLE_FIGURE_ROWS:
+        reason = (
+            "Parameter, unit, formula, or calculation-shaped evidence should remain a table so exact values and units stay visible."
+        )
+        chart_candidates.append(_chart_candidate("table", 0.9, "high", reason))
+        return _make_recommendation(
+            state,
+            table,
+            rec_index,
+            "table",
+            ["table"],
+            "high",
+            reason,
+            {"columns": headers, "rows": rows[1:MAX_TABLE_FIGURE_ROWS + 1]},
+            data_profile=profile,
+            chart_candidates=chart_candidates,
+            selection_warnings=warnings,
+        )
+
+    if summary.get("missing_ratio", 0) >= 0.25 and len(rows) - 1 <= MAX_TABLE_FIGURE_ROWS:
+        reason = "High missing-value density makes a compact table safer than a potentially misleading chart."
+        chart_candidates.append(_chart_candidate("table", 0.78, "medium", reason))
+        return _make_recommendation(
+            state,
+            table,
+            rec_index,
+            "table",
+            ["table"],
+            "medium",
+            reason,
+            {"columns": headers, "rows": rows[1:MAX_TABLE_FIGURE_ROWS + 1]},
+            data_profile=profile,
+            chart_candidates=chart_candidates,
+            selection_warnings=warnings,
+        )
+
+    if any("Time/date labels" in warning for warning in warnings):
+        reason = (
+            "Time/date labels could not be deterministically parsed or sorted, so exact source order should remain visible."
+        )
+        chart_candidates.append(_chart_candidate("table", 0.82, "medium", reason))
+        return _make_recommendation(
+            state,
+            table,
+            rec_index,
+            "table",
+            ["table"],
+            "medium",
+            reason,
+            {"columns": headers, "rows": rows[1:MAX_TABLE_FIGURE_ROWS + 1]},
+            data_profile=profile,
+            chart_candidates=chart_candidates,
+            selection_warnings=warnings,
+        )
+
+    # Mixed units are a problem for charts that share one y-axis, which is
+    # what this guard is for. A scatter of two measures puts each on its own
+    # axis — mixed units are the normal case there, not a defect.
+    scatter_shape = (
+        not time_indices
+        and not categorical_indices
+        and len(relationship_indices) >= 2
+        and len(rows) - 1 >= 3
+    )
+    if summary.get("mixed_measure_units") and not scatter_shape:
+        reason = (
+            "Numeric measure columns use mixed units; keep them as a table or split them into separate charts "
+            "instead of sharing one y-axis."
+        )
+        chart_candidates.append(_chart_candidate("table", 0.91, "high", reason))
+        return _make_recommendation(
+            state,
+            table,
+            rec_index,
+            "table",
+            ["table"],
+            "high",
+            reason,
+            {"columns": headers, "rows": rows[1:MAX_TABLE_FIGURE_ROWS + 1]},
+            data_profile=profile,
+            chart_candidates=chart_candidates,
+            selection_warnings=warnings,
+        )
+
+    label_indices = (categorical_indices or time_indices)
+    if label_indices and error_indices and measure_indices:
+        label_index = label_indices[0]
+        value_index = measure_indices[0]
+        error_index = error_indices[0]
+        payload = _error_bar_payload(headers, rows, label_index, value_index, error_index)
+        if payload["labels"] and len(payload["labels"]) >= MIN_CHART_ROWS:
+            reason = (
+                "Category or ordered observations with a central value and explicit error, SD, SE, CI, "
+                "or uncertainty column should be shown with error bars."
+            )
+            chart_candidates.append(_chart_candidate("error_bar", 0.93, "high", reason))
+            chart_candidates.append(_chart_candidate(
+                "bar",
+                0.62,
+                "low",
+                "Bar can show central values, but it hides uncertainty unless the error column is rendered.",
+            ))
+            return _make_recommendation(
+                state,
+                table,
+                rec_index,
+                "error_bar",
+                ["error_bar"],
+                "high",
+                reason,
+                payload,
+                xlabel=headers[label_index],
+                ylabel=headers[value_index],
+                data_profile=profile,
+                chart_candidates=chart_candidates,
+                selection_warnings=warnings,
+            )
+
+    if (
+        _contains_terms(headers, table.get("content", ""), MATRIX_TERMS)
+        and (categorical_indices or _indices_with_role(profile, TEXT_MIXED_ROLE))
+        and len(measure_indices) >= 2
+        and len(rows) - 1 <= MAX_HEATMAP_ROWS
+    ):
+        label_index = (categorical_indices or _indices_with_role(profile, TEXT_MIXED_ROLE))[0]
+        payload = _heatmap_payload(headers, rows, label_index, measure_indices)
+        if payload["values"] and len(payload["values"][0]) >= 2:
+            reason = (
+                "Matrix-shaped numeric evidence is suited to a heatmap so row/column intensity patterns are visible."
+            )
+            chart_candidates.append(_chart_candidate("heatmap", 0.9, "high", reason))
+            chart_candidates.append(_chart_candidate(
+                "table",
+                0.68,
+                "medium",
+                "A table remains acceptable when exact cell values matter more than pattern visibility.",
+            ))
+            return _make_recommendation(
+                state,
+                table,
+                rec_index,
+                "heatmap",
+                ["heatmap", "table"],
+                "high",
+                reason,
+                payload,
+                xlabel="Columns",
+                ylabel="Rows",
+                data_profile=profile,
+                chart_candidates=chart_candidates,
+                selection_warnings=warnings,
+            )
+
+    if (
+        categorical_indices
+        and len(measure_indices) >= 2
+        and len(measure_indices) <= MAX_STACKED_BAR_SERIES
+        and _all_values_non_negative(rows, measure_indices)
+        and (
+            # Rows that really do sum to a whole are composition anywhere.
+            _row_totals_are_composition_like(rows, measure_indices)
+            # The keyword test is a guess, and it loses to ordered time data:
+            # a monthly defect table carrying one "%" column and a category
+            # column matched on the "%" alone and stacked counts on top of a
+            # percentage, when the trend over months is the whole point. The
+            # stacked-bar branch precedes the time-series branch, so without
+            # this the line chart was unreachable.
+            or (
+                _contains_terms(headers, table.get("content", ""), STACKED_BAR_TERMS)
+                and not time_indices
+            )
+        )
+    ):
+        cat_index = _distinct_label_index(rows, categorical_indices)
+        reason = (
+            "Categorical rows with multiple non-negative part or composition series should be shown as a stacked bar."
+        )
+        chart_candidates.append(_chart_candidate("stacked_bar", 0.91, "high", reason))
+        chart_candidates.append(_chart_candidate(
+            "bar",
+            0.65,
+            "medium",
+            "Grouped bars remain acceptable when direct series-by-series comparison matters more than total composition.",
+        ))
+        return _make_recommendation(
+            state,
+            table,
+            rec_index,
+            "stacked_bar",
+            ["stacked_bar", "bar", "table"],
+            "high",
+            reason,
+            _series_payload(headers, rows, cat_index, measure_indices),
+            xlabel=headers[cat_index],
+            ylabel=", ".join(headers[index] for index in measure_indices),
+            data_profile=profile,
+            chart_candidates=chart_candidates,
+            selection_warnings=warnings,
+        )
+
+    if categorical_indices and len(measure_indices) == 1:
+        cat_index = categorical_indices[0]
+        value_index = measure_indices[0]
+        grouped_series = _grouped_numeric_series(rows, cat_index, value_index)
+        if len(grouped_series) >= 2:
+            reason = (
+                "Repeated numeric measurements within categorical groups should be shown as a boxplot to compare spread."
+            )
+            chart_candidates.append(_chart_candidate("boxplot", 0.86, "high", reason))
+            chart_candidates.append(_chart_candidate(
+                "bar",
+                0.55,
+                "low",
+                "Bar charts hide within-group spread unless values have already been aggregated.",
+            ))
+            return _make_recommendation(
+                state,
+                table,
+                rec_index,
+                "boxplot",
+                ["boxplot", "table"],
+                "high",
+                reason,
+                {"series": grouped_series},
+                xlabel=headers[cat_index],
+                ylabel=headers[value_index],
+                data_profile=profile,
+                chart_candidates=chart_candidates,
+                selection_warnings=warnings,
+            )
+
+    if (
+        not categorical_indices
+        and not time_indices
+        and len(measure_indices) >= 2
+        and len(rows) - 1 >= MIN_DISTRIBUTION_POINTS
+        and _contains_terms(headers, table.get("content", ""), GROUPED_DISTRIBUTION_TERMS)
+    ):
+        grouped_series = _numeric_column_series(headers, rows, measure_indices[:MAX_LINE_BAR_SERIES])
+        if len(grouped_series) >= 2:
+            reason = (
+                "Multiple comparable numeric measurement columns with repeated observations should be shown as a boxplot."
+            )
+            chart_candidates.append(_chart_candidate("boxplot", 0.82, "medium", reason))
+            return _make_recommendation(
+                state,
+                table,
+                rec_index,
+                "boxplot",
+                ["boxplot", "table"],
+                "medium",
+                reason,
+                {"series": grouped_series},
+                xlabel="Series",
+                ylabel=", ".join(headers[index] for index in measure_indices[:MAX_LINE_BAR_SERIES]),
+                data_profile=profile,
+                chart_candidates=chart_candidates,
+                selection_warnings=warnings,
+            )
+
+    if categorical_indices and composition_indices:
+        cat_index = categorical_indices[0]
+        value_index = composition_indices[0]
+        labels = _column_values(rows, cat_index)[:MAX_CHART_ROWS]
+        values = _numeric_values_for_rows(rows, value_index)
+        if 2 <= len(_unique_non_empty(labels)) <= 6 and len(values) == len([label for label in labels if _clean_text(label)]):
+            reason = (
+                "Categorical composition data with non-negative values summing near 1 or 100 "
+                "is best summarized as a pie chart; bar is acceptable for comparison emphasis."
+            )
+            chart_candidates.append(_chart_candidate("pie", 0.95, "high", reason))
+            chart_candidates.append(_chart_candidate(
+                "bar",
+                0.78,
+                "medium",
+                "Bar remains acceptable when comparing segment magnitudes is more important than whole-part perception.",
+            ))
+            return _make_recommendation(
+                state,
+                table,
+                rec_index,
+                "pie",
+                ["pie", "bar"],
+                "high",
+                reason,
+                _series_payload(headers, rows, cat_index, [value_index]),
+                xlabel=headers[cat_index],
+                ylabel=headers[value_index],
+                data_profile=profile,
+                chart_candidates=chart_candidates,
+                selection_warnings=warnings,
+            )
+
+    if time_indices and numeric_indices:
+        x_index = time_indices[0]
+        y_indices = relationship_indices[:3]
+        if not y_indices:
+            return None
+        reason = "Ordered time/step data with numeric measurements should be shown as a line chart to preserve trend direction."
+        chart_candidates.append(_chart_candidate("line", 0.92, "high", reason))
+        return _make_recommendation(
+            state,
+            table,
+            rec_index,
+            "line",
+            ["line"],
+            "high",
+            reason,
+            _series_payload(headers, rows, x_index, y_indices),
+            xlabel=headers[x_index],
+            ylabel=", ".join(headers[index] for index in y_indices),
+            data_profile=profile,
+            chart_candidates=chart_candidates,
+            selection_warnings=warnings,
+        )
+
+    if categorical_indices and (measure_indices or composition_indices):
+        cat_index = _distinct_label_index(rows, categorical_indices)
+        y_indices = (relationship_indices or composition_indices)[:3]
+        reason = "Categorical labels with numeric values should be compared with a bar chart."
+        chart_candidates.append(_chart_candidate("bar", 0.88, "high", reason))
+        return _make_recommendation(
+            state,
+            table,
+            rec_index,
+            "bar",
+            ["bar"],
+            "high",
+            reason,
+            _series_payload(headers, rows, cat_index, y_indices),
+            xlabel=headers[cat_index],
+            ylabel=", ".join(headers[index] for index in y_indices),
+            data_profile=profile,
+            chart_candidates=chart_candidates,
+            selection_warnings=warnings,
+        )
+
+    if len(relationship_indices) >= 2 and len(rows) - 1 >= 3:
+        x_index, y_index = relationship_indices[:2]
+        reason = (
+            "Two numeric measurement variables across multiple observations are suited "
+            "to scatter plots for relationship inspection."
+        )
+        chart_candidates.append(_chart_candidate("scatter", 0.75, "medium", reason))
+        return _make_recommendation(
+            state,
+            table,
+            rec_index,
+            "scatter",
+            ["scatter"],
+            "medium",
+            reason,
+            {
+                "x": [_to_float(row[x_index]) or 0 for row in rows[1:MAX_CHART_ROWS + 1]],
+                "y": [_to_float(row[y_index]) or 0 for row in rows[1:MAX_CHART_ROWS + 1]],
+            },
+            xlabel=headers[x_index],
+            ylabel=headers[y_index],
+            data_profile=profile,
+            chart_candidates=chart_candidates,
+            selection_warnings=warnings,
+        )
+
+    if not categorical_indices and not time_indices and len(measure_indices) == 1 and len(rows) - 1 >= MIN_DISTRIBUTION_POINTS:
+        value_index = measure_indices[0]
+        values = _numeric_values_for_rows(rows, value_index, limit=MAX_LINE_SCATTER_POINTS)
+        if len(values) >= MIN_DISTRIBUTION_POINTS:
+            reason = (
+                "A single numeric measurement column with enough observations and no safer category/time mapping "
+                "is suited to a histogram for distribution shape."
+            )
+            chart_candidates.append(_chart_candidate("histogram", 0.78, "medium", reason))
+            return _make_recommendation(
+                state,
+                table,
+                rec_index,
+                "histogram",
+                ["histogram", "table"],
+                "medium",
+                reason,
+                {"values": values, "bins": min(10, max(5, round(len(values) ** 0.5)))},
+                xlabel=headers[value_index],
+                ylabel="Frequency count",
+                data_profile=profile,
+                chart_candidates=chart_candidates,
+                selection_warnings=warnings,
+            )
+
+    if len(rows) - 1 <= MAX_TABLE_FIGURE_ROWS:
+        reason = (
+            "The evidence has no reliable category, ordered time, composition, or two-measure relationship; "
+            "preserve exact values as a table figure."
+        )
+        chart_candidates.append(_chart_candidate("table", 0.7, "medium", reason))
+        return _make_recommendation(
+            state,
+            table,
+            rec_index,
+            "table",
+            ["table"],
+            "medium",
+            reason,
+            {"columns": headers, "rows": rows[1:MAX_TABLE_FIGURE_ROWS + 1]},
+            data_profile=profile,
+            chart_candidates=chart_candidates,
+            selection_warnings=warnings,
+        )
+
+    return None
+
+
+def _recommendation_score(recommendation: dict) -> float:
+    candidates = recommendation.get("chart_candidates", []) or []
+    top_score = 0.0
+    if candidates and isinstance(candidates[0], dict):
+        try:
+            top_score = float(candidates[0].get("score", 0) or 0)
+        except (TypeError, ValueError):
+            top_score = 0.0
+    transform = recommendation.get("data_transform", {}) if isinstance(recommendation.get("data_transform", {}), dict) else {}
+    if transform.get("status") == "transformed":
+        top_score += 0.03
+        output_shape = transform.get("output_shape", {}) if isinstance(transform.get("output_shape", {}), dict) else {}
+        if int(output_shape.get("rows", 0) or 0) <= MAX_BAR_CATEGORIES:
+            top_score += 0.02
+    top_score -= 0.01 * len(recommendation.get("selection_warnings", []) or [])
+    return top_score
+
+
+def recommend_figures_from_evidence(state: ReportState, evidence: list[dict]) -> list[dict]:
+    """Build chart recommendations from table-shaped evidence."""
+    recommendations: list[dict] = []
+    for table in _table_candidates(evidence):
+        variants = build_table_variants(
+            table,
+            max_bar_categories=MAX_BAR_CATEGORIES,
+            max_pie_slices=MAX_PIE_SLICES,
+        )
+        candidates = [
+            rec for variant in variants
+            if (rec := _recommend_single_table(state, variant, len(recommendations) + 1)) is not None
+        ]
+        if not candidates:
+            continue
+        recommendations.append(max(candidates, key=_recommendation_score))
+
+    return recommendations
+
+
+def _write_recommendation_report(state: ReportState, recommendations: list[dict]) -> str:
+    report = {
+        "job_id": state.job_id,
+        "status": "available" if recommendations else "no_table_chart_candidates",
+        "recommendation_count": len(recommendations),
+        "recommendations": recommendations,
+    }
+    return write_json_artifact(state, "figure_recommendations.json", report)
+
+
+def run_figure_recommend(state: ReportState) -> ReportState:
+    """Recommend chart types from parsed table evidence before agent authoring."""
+    evidence = load_jsonl(state.sources.get("evidence_ledger_path"))
+    recommendations = recommend_figures_from_evidence(state, evidence)
+    path = _write_recommendation_report(state, recommendations)
+    state.output["figure_recommendations_path"] = path
+    state.plan["figure_recommendation_count"] = len(recommendations)
+    return state

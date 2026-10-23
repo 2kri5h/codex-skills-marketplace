@@ -1,0 +1,49 @@
+{
+  "job_id": "run_9fb2cf1e",
+  "status": "passed",
+  "generated_count": 5,
+  "issue_count": 0,
+  "issues": [],
+  "figures": [
+    {
+      "figure_id": "1",
+      "figure_type": "bar",
+      "path": "D:\\report_workflow\\output\\benchmark_runs\\Evidence-Bounded Workflow Project for Graduate Study Readiness--run_9fb2cf1e\\figures\\1.png",
+      "status": "passed",
+      "issue_count": 0,
+      "issues": []
+    },
+    {
+      "figure_id": "2",
+      "figure_type": "line",
+      "path": "D:\\report_workflow\\output\\benchmark_runs\\Evidence-Bounded Workflow Project for Graduate Study Readiness--run_9fb2cf1e\\figures\\2.png",
+      "status": "passed",
+      "issue_count": 0,
+      "issues": []
+    },
+    {
+      "figure_id": "3",
+      "figure_type": "scatter",
+      "path": "D:\\report_workflow\\output\\benchmark_runs\\Evidence-Bounded Workflow Project for Graduate Study Readiness--run_9fb2cf1e\\figures\\3.png",
+      "status": "passed",
+      "issue_count": 0,
+      "issues": []
+    },
+    {
+      "figure_id": "4",
+      "figure_type": "boxplot",
+      "path": "D:\\report_workflow\\output\\benchmark_runs\\Evidence-Bounded Workflow Project for Graduate Study Readiness--run_9fb2cf1e\\figures\\4.png",
+      "status": "passed",
+      "issue_count": 0,
+      "issues": []
+    },
+    {
+      "figure_id": "5",
+      "figure_type": "table",
+      "path": "D:\\report_workflow\\output\\benchmark_runs\\Evidence-Bounded Workflow Project for Graduate Study Readiness--run_9fb2cf1e\\figures\\5.png",
+      "status": "passed",
+      "issue_count": 0,
+      "issues": []
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+name: business_report
+description: Business/work report format with executive summary
+
+# Optional front matter for work reports
+front_matter:
+  title: ""                    # Optional: Report title
+  short_title: ""              # Optional: Abbreviated title
+  author_block: ""             # Optional: Prepared by
+  affiliation_block: ""        # Optional: Organization/Department
+  correspondence: ""          # Optional: Contact information
+  keywords: []                 # Optional: 3-5 topic keywords
+  acknowledgements: ""         # Optional
+  funding: ""                  # Optional
+  conflict_note: ""            # Optional
+
+section_order:
+  - executive_summary
+  - findings
+  - limitations
+  - recommendations
+  - appendix
+  - references
+sections:
+  executive_summary:
+    section_id: executive_summary
+    title: Executive Summary
+    title_zh: 執行摘要
+    required: true
+    section_type: exec_summary
+    order: 1
+  findings:
+    section_id: findings
+    title: Key Findings
+    title_zh: 主要發現
+    required: true
+    section_type: findings
+    order: 2
+    # A business report routinely covers several independent subjects — four
+    # product categories, four sites, four quarters — each with its own cost
+    # structure and its own evidence. One flat findings section could only
+    # hold them as prose, so nothing could check which claims belonged to
+    # which subject. Declaring `subsections` in outline.json says it, and the
+    # claim and figure ids are hoisted into the section so every downstream
+    # gate keeps working unchanged.
+    supports_subsections: true
+  # What would weaken the conclusions above. An unassisted write-up of the same
+  # source opened its counter-evidence chapter by conceding that its own headline
+  # recommendation might be an artefact of which listings carry a sales figure,
+  # and three assisted runs of the same task shipped no equivalent paragraph
+  # because nothing asked for one. Requiring the section is what fixed that.
+  #
+  # It briefly also required the outline to list the claim ids this section
+  # qualified. That list never reached the page — it was bookkeeping the reader
+  # never saw — so it is gone. `counter_evidence` now carries one rule that does
+  # change the document: a section with a single claim is a disclaimer, so it
+  # needs two.
+  limitations:
+    section_id: limitations
+    title: Data Limitations and Counter-Evidence
+    title_zh: 資料限制與反面證據
+    required: true
+    section_type: limitations
+    order: 3
+    counter_evidence: true
+  recommendations:
+    section_id: recommendations
+    title: Recommendations
+    title_zh: 建議事項
+    required: true
+    section_type: recommendations
+    order: 4
+    # The reader asked something — whether to enter, where to enter — and a
+    # report can state four hundred checked figures without answering it. The
+    # questions are extracted from the task statement and listed in the outline
+    # brief against this section.
+    #
+    # They used to have to be answered by index, each bound to a claim. That was
+    # a JSON mapping exercise standing in for a sentence, and the sentence is
+    # what the reader needs: the brief now says which questions were found and
+    # the gate is gone. A statement that asks for work rather than answers
+    # extracts none, and then this shows nothing.
+    must_answer_prompt_questions: true
+  appendix:
+    section_id: appendix
+    title: Appendix
+    title_zh: 附錄
+    required: false
+    section_type: appendix
+    order: 5
+    supports_subsections: true
+  # Generated from the evidence ledger by CITATION_BIND and appended at
+  # render; the author writes nothing here. Declared so the heading carries
+  # the blueprint's localized title like every other section.
+  references:
+    section_id: references
+    title: References
+    title_zh: 參考文獻
+    required: false
+    section_type: references
+    order: 6

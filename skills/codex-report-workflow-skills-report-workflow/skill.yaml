@@ -1,0 +1,431 @@
+name: report-workflow
+description: >
+  Generate publication-ready DOCX reports from source data using a
+  deterministic prepare -> agent author -> validate -> render pipeline.
+  Supports controlled staged authoring, legacy 4-step incremental authoring,
+  deterministic chart guidance, proactive non-quantitative academic and
+  engineering schematics/concept illustrations, report-contained
+  business-report schematics, optional external research via web backends
+  (Tavily/Serper/SerpAPI), optional NotebookLM knowledge sync, report profiles,
+  exact fixed-template/cover preservation QA, and Chinese engineering report
+  guidelines.
+
+version: "4.0"
+
+prerequisites:
+  python: ">=3.11"
+  packages:
+    - "pip install -e . (in repo root)"
+  external_tools:
+    - name: pandoc
+      version: ">=3.0"
+      required: true
+      severity: critical
+      install:
+        windows: "winget install JohnMacFarlane.Pandoc"
+        linux: "apt install pandoc"
+        macos: "brew install pandoc"
+      note: >
+        Required for high-quality DOCX rendering. Without pandoc, the pipeline
+        falls back to a limited python-docx converter with degraded output.
+    - name: mmdc
+      required: false
+      severity: optional
+      install:
+        generic: "npm install -g @mermaid-js/mermaid-cli"
+      note: >
+        Converts mermaid code fences to PNG diagrams. Without mmdc,
+        mermaid blocks are preserved as code blocks in the final DOCX.
+  optional_integrations:
+    - name: notebooklm-py
+      feature_flag: enable_notebook_sync
+      install: "pip install notebooklm-py"
+      note: >
+        Optional. Enables NotebookLM knowledge sync (source context,
+        analysis Q&A). Requires authenticated browser session.
+    - name: tavily
+      feature_flag: enable_research
+      env_var: TAVILY_API_KEY
+      note: >
+        Optional. Recommended backend for automated web research and
+        claim verification. Sign up at https://tavily.com.
+    - name: serper
+      feature_flag: enable_research
+      env_var: SERPER_API_KEY
+      note: >
+        Optional. Alternative Google search backend for claim verification.
+    - name: serpapi
+      feature_flag: enable_research
+      env_var: SERPAPI_API_KEY
+      note: >
+        Optional. Alternative Google search backend for claim verification.
+
+entry_point: report_workflow.agent_wrapper
+
+tools:
+  # Step 0: Environment check & dependency install (call on EVERY run)
+  - name: check_environment
+    description: >
+      Pre-flight environment check. Call BEFORE start_report on every run.
+      Returns pending_installs (missing dependencies the agent should install
+      with user consent), agent_should_ask_user (features to ask about, some
+      requiring user input like API keys or NotebookLM URLs), and a
+      human-readable message summarizing everything. After installing
+      dependencies, re-run check_environment to verify. Does NOT start a workflow.
+    parameters: []
+
+  # Step 1: Prepare deterministic artifacts and task briefs
+  - name: start_report
+    description: >
+      Start the report generation workflow. Parses source files, builds
+      evidence ledger, generates blueprint and task briefs for the agent.
+      Requires check_environment first. The caller must ask the user about every
+      pending install and optional feature, then pass preflight_confirmed=true
+      and a complete preflight_decisions record. preflight_confirmed=true alone
+      is rejected. Required dependencies must actually pass preflight after
+      installation; a decision string does not override a still-missing
+      dependency.
+    parameters:
+      - name: prompt
+        type: string
+        required: true
+        description: User prompt describing the desired report
+      - name: source_files
+        type: list[object]
+        required: true
+        description: >
+          Source files to use. Legacy strings are accepted. Prefer structured
+          entries when roles matter: {"path": "source.pdf", "role": "source_data"}
+          or {"path": "base.docx", "role": "base_document"}. Valid roles are
+          source_data and base_document.
+      - name: output_dir
+        type: string
+        required: true
+        description: Directory to write final output files
+      - name: report_profile
+        type: string
+        required: false
+        description: >
+          Report profile ID. Built-ins: engineering_lab_report,
+          academic_paper, business_report, proposal, admissions_report,
+          admissions_project_report, and custom. Defaults to profile inference
+          from the prompt, then academic_paper.
+      - name: task_intent
+        type: string
+        required: false
+        description: >
+          new_draft or revise_existing. Use revise_existing when one structured
+          source entry has role=base_document.
+      - name: title
+        type: string
+        required: false
+        description: Structured front matter title. Strongly recommended for academic_paper.
+      - name: author_block
+        type: string
+        required: false
+        description: Structured author line for front matter.
+      - name: affiliation_block
+        type: string
+        required: false
+        description: Structured affiliation line for front matter.
+      - name: correspondence
+        type: string
+        required: false
+        description: Correspondence email/contact for front matter.
+      - name: keywords
+        type: list[string]
+        required: false
+        description: Structured front matter keywords. Use thesis-aligned academic terms.
+      - name: template_fields
+        type: object
+        required: false
+        description: >
+          Optional fixed-template/front-matter fields such as course_name,
+          student_id, instructor, lab_section, date, or department. These are
+          rendered into the front matter and audited in
+          template_field_fill_report.json.
+      - name: reference_docx
+        type: string
+        required: false
+        description: >
+          Optional path to a user-supplied .docx template. The rendered
+          document follows its styles, margins, and header/footer (including
+          page numbers). Requires pandoc; an unusable template hard-blocks
+          the render instead of silently using the default look.
+      - name: project_identity
+        type: object
+        required: false
+        description: >
+          Optional project identity contract with required_terms,
+          required_context_terms, forbidden_terms, canonical_title_terms,
+          domain_context, and author_metadata. Use to prevent topic drift.
+      - name: enable_research
+        type: boolean
+        required: false
+        description: >
+          Enable external web research for claim verification. When true,
+          blocked/disputed claims are automatically researched via configured
+          backends (Tavily, Serper, SerpAPI, BrowserMCP). Requires at least
+          one API key env var to be set; falls back to no-op without keys.
+      - name: enable_notebook_sync
+        type: boolean
+        required: false
+        description: >
+          Enable NotebookLM knowledge sync. When true, the pipeline syncs
+          context from a matching NotebookLM notebook after evidence store.
+          Requires notebooklm-py to be installed.
+      - name: notebooklm_notebook_id
+        type: string
+        required: false
+        description: >
+          Specific NotebookLM notebook ID to sync with. If not provided,
+          the pipeline selects a notebook matching the report topic.
+      - name: notebooklm_storage_path
+        type: string
+        required: false
+        description: >
+          Path to NotebookLM authentication storage state file. Auto-detected
+          if not provided (searches ~/.notebooklm/ and LOCALAPPDATA).
+      - name: preflight_confirmed
+        type: boolean
+        required: false
+        description: >
+          Must be true only after the user has explicitly answered every
+          pending install and optional feature question returned by check_environment.
+      - name: preflight_decisions
+        type: object
+        required: false
+        description: >
+          Structured record of the user's preflight choices. Required shape:
+          confirmed_by_user=true, install_decisions keyed by pending install,
+          and feature_decisions keyed by feature_id. Use the
+          required_preflight_decisions value from check_environment as the template.
+      - name: allow_degraded_render
+        type: boolean
+        required: false
+        description: >
+          Set true only after the user explicitly accepts degraded DOCX
+          rendering when a critical render dependency such as pandoc is missing.
+
+
+  # Preferred controlled harness workflow
+  - name: get_next_action
+    description: >
+      Return the current controlled authoring stage for a job, including the
+      task brief, read-first files, allowed write paths, validation tool, and
+      repair context from the previous failed attempt. Use this by default
+      after start_report before editing agent-authored artifacts.
+    parameters:
+      - name: job_id
+        type: string
+        required: true
+        description: The job ID returned by start_report
+      - name: workspace_root
+        type: string
+        required: false
+        description: Optional output workspace root if the job is outside the default run registry
+
+  - name: submit_action
+    description: >
+      Submit the current controlled stage. Enforces the harness write scope
+      before running the stage validator, records evidence in
+      harness_manifest.json, advances only on pass, and returns repair context
+      without rerunning unrelated stages when validation fails. Returns
+      blocked_non_author_repair when a read-only stage fails without a legal
+      author-owned repair target.
+    parameters:
+      - name: job_id
+        type: string
+        required: true
+        description: The job ID returned by start_report
+      - name: workspace_root
+        type: string
+        required: false
+        description: Optional output workspace root if the job is outside the default run registry
+
+  - name: lint_artifacts
+    description: >
+      Read-only lint for agent-authored artifacts before full validation.
+      Writes artifact_lint_report.json with artifact names, JSON paths,
+      severity, messages, and repair hints. Use after creating or changing
+      claim_matrix.json, outline.json, structured_drafts.json,
+      section_drafts/*.md, sentence_map.jsonl, or revision_plan.json.
+    parameters:
+      - name: job_id
+        type: string
+        required: true
+        description: The job ID returned by start_report
+
+  - name: register_derived_evidence
+    description: >
+      Make a statistic over the source rows citable. The ledger holds one row
+      per record, so a sample size, a median, a share or a concentration index
+      has no evidence id and the sentence needing one goes unwritten. A scalar
+      derivation is {"id", "source", "rows", "op", "column", "k", "of",
+      "label", "expect"}; ops are count, sum, mean, median, min, max,
+      distinct, share, hhi, top_share, and row filters are col=value,
+      col!=value, col>=n, col~text joined with &. Adding "group_by" and a list
+      of "measures" returns a whole table instead - one row per group, one
+      column per measure, registered as a single evidence entry that a
+      [TABLE:<id>] marker can place: {"id": "price_band_reliability",
+      "source": "products.csv", "group_by": {"column": "price", "buckets":
+      [0, 30, 50, 100], "label": "Price band"}, "measures": [{"op": "count"},
+      {"op": "mean", "column": "rating"}, {"op": "share", "rows":
+      "rating < 4"}]}. Omit "buckets" for a categorical column; bucket edges
+      are never guessed, because where a numeric axis is cut is the finding.
+      "source" also takes two files with a "join", which is the only way to
+      reach a finding neither file states alone: {"id": "band_review_rating",
+      "source": ["reviews.csv", "products.csv"], "join": {"on": "asin",
+      "how": "inner"}, "group_by": {"column": "price", "buckets": [0, 30, 50,
+      100]}, "measures": [{"op": "mean", "column": "review_rating"}]}. Rows
+      that find no partner are counted and reported in the evidence text, and
+      a column name present on both sides is renamed rather than overwritten;
+      check two tables for a shared key before writing that they cannot be
+      crossed, and the task brief lists the pairs that share one. Two further
+      ops, "ratio" and "pp_diff", compare figures already computed, so an
+      argument can state a multiple or a gap in percentage points and cite it.
+      Either read two rows of a table registered earlier - {"id":
+      "premium_vs_budget", "op": "ratio", "source": "price_band_reliability",
+      "column": "Listings", "numerator_group": "200-500",
+      "denominator_group": "0-30", "decimals": 1} - or name two registered
+      derivations, which is what a comparison across files needs: {"id":
+      "photo_share", "op": "ratio", "numerator": "photo_count",
+      "denominator": "listing_count"}. "pp_diff" is numerator minus
+      denominator and takes two percentages; "ratio" is numerator over
+      denominator and carries no unit; both read figures produced earlier in
+      the same call, so order matters. "decimals" pins how many places a
+      figure is rounded to before it is recorded, and the evidence then states
+      exactly that many - use it when a claim needs "3.53%", since the content
+      check refuses a claim carrying more places than its evidence. The value
+      is computed from the rows here rather than supplied by the caller, and
+      "expect" is checked against it instead of trusted. Returns the
+      evidence_id to cite.
+    parameters:
+      - name: job_id
+        type: string
+        required: true
+        description: The job ID returned by start_report
+      - name: derivations
+        type: array
+        required: true
+        description: Derivation requests, each with at least an id and an op
+      - name: workspace_root
+        type: string
+        required: false
+        description: Optional output workspace root if the job is outside the default run registry
+
+  - name: audit_engineering_report
+    description: >
+      Read-only engineering lab audit for units, measurements, and simple
+      arithmetic. Writes engineering_audit_report.json with recognized
+      measurements, claim/evidence unit-support warnings, unit notation
+      warnings, table-value support checks, mixed-dimension unit notes,
+      missing-unit notes, and simple calculation result warnings.
+      Recommended for engineering_lab_report.
+    parameters:
+      - name: job_id
+        type: string
+        required: true
+        description: The job ID returned by start_report
+
+  - name: publish_report
+    description: >
+      Run full validation pipeline and render the final DOCX.
+      Can be called after steps 2-4, or directly after step 1 if
+      all artifacts were created in one shot (legacy 2-step mode).
+      On success, returns post_render_layout_manifest_path for render
+      structure audit evidence plus final_qa_summary_path and
+      final_qa_summary_md_path for delivery readiness review. Also returns
+      figure_visual_quality_report_path for chart readability review, plus
+      template_style_map_path/template_style_map_md_path and
+      template_field_fill_report_path/template_field_fill_report_md_path when
+      published packaging runs.
+    parameters:
+      - name: job_id
+        type: string
+        required: true
+        description: The job ID returned by start_report
+      - name: reference_docx
+        type: string
+        required: false
+        description: >
+          Optional path to a user-supplied .docx template to follow for
+          styles, margins, and header/footer at render time.
+
+  # Evidence query tool
+  - name: query_evidence
+    description: >
+      Look up specific evidence entries by ID, or browse the evidence
+      ledger in pages. Use this instead of loading the entire
+      evidence_ledger.jsonl file to save context window space.
+    parameters:
+      - name: job_id
+        type: string
+        required: true
+        description: The job ID returned by start_report
+      - name: evidence_ids
+        type: list[string]
+        required: false
+        description: >
+          Optional list of specific evidence_id values to retrieve.
+          If provided, offset/limit are ignored.
+      - name: query
+        type: string
+        required: false
+        description: >
+          Optional text query for relevance-ranked evidence browsing. Supports
+          English terms and CJK bigram matching. Ignored when evidence_ids is
+          provided.
+      - name: offset
+        type: integer
+        required: false
+        description: Starting index for paginated browsing (default 0)
+      - name: limit
+        type: integer
+        required: false
+        description: Maximum entries to return (default 20, max 50)
+
+  - name: remap_agent_artifacts
+    description: >
+      Remap evidence IDs in claim_matrix.json, sentence_map.jsonl, and
+      section draft [CITE:] markers from a previous job to the current job.
+      Defaults to dry-run; set write=true to update files and refresh artifact contracts.
+    parameters:
+      - name: job_id
+        type: string
+        required: true
+        description: Current workflow job id.
+      - name: previous_job_id
+        type: string
+        required: true
+        description: Previous workflow job id whose artifacts were reused.
+      - name: write
+        type: boolean
+        required: false
+        description: Apply remap changes when true; dry-run when false.
+
+  # Revision workflow tools
+  - name: submit_revision_plan
+    description: >
+      Validate a revision_plan.json for revise_existing workflows.
+      Pre-checks all changes against the base document: verifies
+      original_text matches, detects conflicts, and returns a diff
+      preview. This remains available for legacy compatibility; the
+      default public flow should use get_next_action and
+      submit_action so revision_plan edits stay within the
+      harness write-scope contract.
+    parameters:
+      - name: job_id
+        type: string
+        required: true
+        description: The job ID returned by start_report
+
+  - name: preview_revision_diff
+    description: >
+      Preview the diff that revision_plan.json would produce without
+      applying any changes. Read-only. Use to inspect before committing.
+    parameters:
+      - name: job_id
+        type: string
+        required: true
+        description: The job ID returned by start_report
